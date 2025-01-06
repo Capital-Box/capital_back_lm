@@ -1,4 +1,11 @@
-import { IRequest, IRequestBody, IRequestContext, IRequestHeaders, IRequestPathParameters, IRequestQueryParameters } from "../types/request.type";
+import {
+  IRequest,
+  IRequestBody,
+  IRequestContext,
+  IRequestHeaders,
+  IRequestPathParameters,
+  IRequestQueryParameters,
+} from "../types/request.type";
 
 export class RequestDTO {
   private headers: IRequestHeaders;
@@ -19,14 +26,18 @@ export class RequestDTO {
     return this.headers;
   }
 
+  getContext(): IRequestContext {
+    return this.context;
+  }
+
   getMultipartHeaders(): { [key: string]: string[] } {
     const headers = this.headers;
     const headersKeys = Object.keys(headers);
 
     const multipartHeaders = {};
     headersKeys.map((headerKey) => {
-      multipartHeaders[headerKey] = headers[headerKey]?.split(',');
-    })
+      multipartHeaders[headerKey] = headers[headerKey]?.split(",");
+    });
 
     return multipartHeaders;
   }
@@ -61,7 +72,7 @@ export class RequestDTO {
       queryParameters: this.queryParameters,
       pathParameters: this.pathParameters,
       body: this.body,
-      context: this.context
-    }
+      context: this.context,
+    };
   }
 }

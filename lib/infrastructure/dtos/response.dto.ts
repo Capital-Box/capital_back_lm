@@ -1,11 +1,27 @@
-import { IResponse, IResponseBody, IResponseData, IResponseErrors, IResponseHeaders } from "../types/response.type";
+import {
+  IResponse,
+  IResponseBody,
+  IResponseContext,
+  IResponseData,
+  IResponseErrors,
+  IResponseHeaders,
+} from "../types/response.type";
 
 export class ResponseDTO {
   private headers: IResponseHeaders;
   private body: IResponseBody;
   private statusCode: number;
+  private context: IResponseContext;
 
-  constructor() { }
+  constructor() {}
+
+  setContext(context: IResponseContext): void {
+    this.context = context;
+  }
+
+  getContext(): IResponseContext {
+    return this.context;
+  }
 
   setHeaders(headers: IResponseHeaders): void {
     this.headers = headers;
@@ -35,8 +51,7 @@ export class ResponseDTO {
     return {
       headers: this.headers,
       body: JSON.stringify(this.body),
-      statusCode: this.statusCode
-    }
+      statusCode: this.statusCode,
+    };
   }
-
 }
