@@ -4,13 +4,18 @@ import { ResponseDTO } from "../../dtos/response.dto";
 import { ApiGatewayMapper } from "../../mappers/apigateway.mapper";
 import { ApiGatewayPort } from "../../ports/inputs/apigateway.port";
 import { InputAdapter } from "./input.adapter";
-import { APIGatewayProxyEvent, APIGatewayProxyResultV2 } from "aws-lambda";
+import { APIGatewayProxyEventBase, APIGatewayProxyResultV2 } from "aws-lambda";
 
 export abstract class ApiGatewayAdapter
-  extends InputAdapter<APIGatewayProxyEvent, APIGatewayProxyResultV2>
+  extends InputAdapter<
+    APIGatewayProxyEventBase<{ user_id?: string }>,
+    APIGatewayProxyResultV2
+  >
   implements ApiGatewayPort
 {
-  async handle(req: APIGatewayProxyEvent): Promise<APIGatewayProxyResultV2> {
+  async handle(
+    req: APIGatewayProxyEventBase<{ user_id?: string }>
+  ): Promise<APIGatewayProxyResultV2> {
     const apiGatewayRequestDTO = new ApiGatewayRequestDTO(req);
     const requestDTO = ApiGatewayMapper.toRequestDTO(apiGatewayRequestDTO);
     const responseDTO = await this.invoke(requestDTO);

@@ -11,45 +11,76 @@ export abstract class SQSAdapter
   extends InputAdapter<SQSEvent, void>
   implements SQSPort
 {
-  async handle(event: SQSEvent): Promise<void> {
-    /*try {
-      const requestDTOs = SQSMapper.toRequestDTO(event);
-      const processedEvents: Promise<ResponseDTO>[] = [];
-      for (const requestDTO of requestDTOs) {
-        const eventProcessing = this.invoke(requestDTO);
-        eventProcessing
-          .then((response) => this.onSuccessfullProcessedItem(response))
-          .catch((exception: Exception | unknown) => {
-            if (exception instanceof Exception)
-              return this.onFailedProcessedItem(exception);
-            return this.onFailedProcessedItem(new UnexpectedException());
-          });
-        processedEvents.push(eventProcessing);
-      }
-      const results = await Promise.all(processedEvents);
-      this.onProccessedQueue(results);
+  protected onSuccessfullProccessedRecord(response: ResponseDTO): void {
+    console.log(`Processed record: ${response.getContext().requestId}`);
+  }
+
+  protected onFailedProcessedRecord(
+    record: RequestDTO,
+    exception: Exception
+  ): void {
+    console.log(`Failed to process record: ${record.getRequestId()}`);
+    console.error(exception);
+  }
+
+  protected onSuccessfullProcessedQueue(
+    successfullResults: ResponseDTO[],
+    failedResults: Exception[]
+  ): void {
+    console.log(
+      `Processed results: (${successfullResults.length})`,
+      successfullResults
+        .map((results) => results.getContext().requestId)
+        .join(", ")
+    );
+    console.log(`Failed results (${failedResults.length}): `, failedResults);
+  }
+
+  protected onFailedProcessedQueue(exception: Exception): void {
+    console.error(`Failed executing queue: `, exception);
+  }
+
+  private async processRecord(
+    record: RequestDTO
+  ): Promise<ResponseDTO | Exception> {
+    try {
+      const response = await this.invoke(record);
+      this.onSuccessfullProccessedRecord(response);
+      return response;
     } catch (err: Exception | unknown) {
-      if (err instanceof Exception) {
-        this.onFailedQueue(err);
-        throw err;
-      }
-
-      const unexpectedException = new UnexpectedException();
-      this.onFailedQueue(unexpectedException);
-      throw unexpectedException;
+      const exception =
+        err instanceof Exception ? err : new UnexpectedException();
+      this.onFailedProcessedRecord(record, exception);
+      return exception;
     }
-      */
   }
 
-  protected onSuccessfullProcessedItem(responseDTO: ResponseDTO): void {
-    console.log("Processed SQS Record: ", responseDTO.getContext().requestId);
+  private processRecords(
+    records: RequestDTO[]
+  ): Promise<ResponseDTO | Exception>[] {
+    const processingRecords: Promise<ResponseDTO | Exception>[] = [];
+    for (const record of records)
+      processingRecords.push(this.processRecord(record));
+    return processingRecords;
   }
 
-  protected onFailedProcessedItem(exception: Exception): void {}
-
-  protected onProccessedQueue(responseDTOs: ResponseDTO[]): void {}
-
-  protected onFailedQueue(exception: Exception): void {}
+  async handle(event: SQSEvent): Promise<void> {
+    try {
+      const requests = SQSMapper.toRequestDTO(event);
+      const processingRecords = this.processRecords(requests);
+      const processedRecords = await Promise.allSettled(processingRecords);
+      const failedProccesedRecords: Exception[] = processedRecords
+        .filter((record) => record.status === "rejected")
+        .map((record) => record.reason as Exception);
+      const successProcessedRecords: ResponseDTO[] = processedRecords
+        .filter((record) => record.status === "fulfilled")
+        .map((record) => record.value as ResponseDTO);
+      this.onSuccessfullProcessedQueue(
+        successProcessedRecords,
+        failedProccesedRecords
+      );
+    } catch (err: Exception | unknown) {}
+  }
 
   protected abstract invoke(req: RequestDTO): Promise<ResponseDTO>;
 }
