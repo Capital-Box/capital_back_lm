@@ -1,15 +1,15 @@
-import { SQSEvent } from "aws-lambda";
+import { SNSEvent } from "aws-lambda";
 import { InputAdapter } from "./input.adapter";
-import { SQSPort } from "../../ports/inputs/sqs.port";
-import { SQSMapper } from "../../mappers/sqs.mapper";
+import { SNSPort } from "../../ports/inputs/sns.port";
+import { SNSMapper } from "../../mappers/sns.mapper";
 import { RequestDTO } from "../../dtos/request.dto";
 import { ResponseDTO } from "../../dtos/response.dto";
 import { Exception } from "../../../shared/exceptions/exception";
 import { UnexpectedException } from "../../../shared/exceptions/unexpected.exception";
 
-export abstract class SQSAdapter
-  extends InputAdapter<SQSEvent, void>
-  implements SQSPort
+export abstract class SNSAdapter
+  extends InputAdapter<SNSEvent, void>
+  implements SNSPort
 {
   protected onSuccessfullProccessedRecord(response: ResponseDTO): void {
     console.log(`Processed record: ${response.getContext().requestId}`);
@@ -23,7 +23,7 @@ export abstract class SQSAdapter
     console.error(exception);
   }
 
-  protected onSuccessfullProcessedQueue(
+  protected onSuccessfullProcessedEvent(
     successfullResults: ResponseDTO[],
     failedResults: Exception[]
   ): void {
@@ -36,7 +36,7 @@ export abstract class SQSAdapter
     console.log(`Failed results (${failedResults.length}): `, failedResults);
   }
 
-  protected onFailedProcessedQueue(exception: Exception): void {
+  protected onFailedProcessedEvent(exception: Exception): void {
     console.error(`Failed executing queue: `, exception);
   }
 
@@ -64,9 +64,9 @@ export abstract class SQSAdapter
     return processingRecords;
   }
 
-  async handle(event: SQSEvent): Promise<void> {
+  async handle(event: SNSEvent): Promise<void> {
     try {
-      const requests = SQSMapper.toRequestDTO(event);
+      const requests = SNSMapper.toRequestDTO(event);
       const processingRecords = this.processRecords(requests);
       const processedRecords = await Promise.allSettled(processingRecords);
       const failedProccesedRecords: Exception[] = processedRecords
@@ -75,13 +75,13 @@ export abstract class SQSAdapter
       const successProcessedRecords: ResponseDTO[] = processedRecords
         .filter((record) => record.status === "fulfilled")
         .map((record) => record.value as ResponseDTO);
-      this.onSuccessfullProcessedQueue(
+      this.onSuccessfullProcessedEvent(
         successProcessedRecords,
         failedProccesedRecords
       );
-    } catch (err: Exception | unknown) {
+    } catch (err) {
       if (err instanceof Exception) {
-        this.onFailedProcessedQueue(err);
+        this.onFailedProcessedEvent(err);
       }
       throw err;
     }
