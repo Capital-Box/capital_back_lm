@@ -1,0 +1,3 @@
+services:
+  users: 
+    path: src/modules/users
