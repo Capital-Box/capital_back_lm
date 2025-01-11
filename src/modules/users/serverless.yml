@@ -66,6 +66,16 @@ resources:
         ExplicitAuthFlows:
           - USER_PASSWORD_AUTH
 functions:
-    register:
-      handler: src/handlers/register.handler
+  users:
+    handler: src/modules/users/handlers/login.handler
+    events:
+      - http:
+          path: login
+          method: post
+      - http:
+          path: register
+          method: post
+      - http:
+          path: refresh-token 
+          method: post
 
