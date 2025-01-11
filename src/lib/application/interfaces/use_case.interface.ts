@@ -1,4 +1,4 @@
-export interface IUseCase<TInput = undefined, TResult = undefined> {
+export interface IUseCase<TInput = unknown, TResult = unknown> {
   invoke(input: TInput): TResult;
 }
 

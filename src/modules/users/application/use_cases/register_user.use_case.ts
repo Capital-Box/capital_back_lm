@@ -1,12 +1,15 @@
 import { IUseCase } from '../../../../lib/application/interfaces/use_case.interface';
-import { RegisterUserDTO } from '../../infrastructure/dtos/register_user.dto';
-import { CognitoAuthPort } from '../../infrastructure/ports/cognito_register.port';
+import { CognitoRegisterAdapter } from '../../infrastructure/adapters/cognito_adapter/congito_register.adapter';
+import { RegisterUserRequestDTO, RegisterUserResponseDTO } from '../../infrastructure/dtos/register_user.dto';
 
 
-export class RegisterUserUseCase implements IUseCase<RegisterUserDTO, void> {
-  constructor(private readonly cognitoAuthPort: CognitoAuthPort) {}
+export class RegisterUserUseCase implements IUseCase<RegisterUserRequestDTO, Promise<RegisterUserResponseDTO>> {
+  constructor(private readonly cognitoRegisterAdapter: CognitoRegisterAdapter) {}
 
-  async invoke(input: RegisterUserDTO): Promise<void> {
-    await this.cognitoAuthPort.register(input);
+  async invoke(input: RegisterUserRequestDTO): Promise<RegisterUserResponseDTO> {
+    const token = await this.cognitoRegisterAdapter.handle(input);
+    return new RegisterUserResponseDTO(token.access_token, token.id_token);        
   }
+
+
 }

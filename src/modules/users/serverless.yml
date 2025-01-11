@@ -12,7 +12,7 @@ provider:
 
   # Logs Configs
   logRetentionInDays: 1
-enviorment:
+enviroment:
   COGNITO_CLIENT_ID:
     Ref: UserPoolClient
   COGNITO_USER_POOL_ID:
@@ -66,16 +66,18 @@ resources:
         ExplicitAuthFlows:
           - USER_PASSWORD_AUTH
 functions:
-  users:
-    handler: src/modules/users/handlers/login.handler
+  login:
+    handler: handler.login
     events:
       - http:
           path: login
           method: post
+  register:
+    handler: handler.register
+    events:
       - http:
           path: register
           method: post
-      - http:
-          path: refresh-token 
-          method: post
+  
+
 

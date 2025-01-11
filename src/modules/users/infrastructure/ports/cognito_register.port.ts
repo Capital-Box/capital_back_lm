@@ -1,5 +1,6 @@
-import { RegisterUserDTO } from '../dtos/register_user.dto';
+import { InputPort } from '../../../../lib/infrastructure/ports/inputs/input.port';
+import { RegisterUserDTO, RegisterUserResponseDTO } from '../dtos/register_user.dto';
 
-export interface CognitoAuthPort {
-  register(input: RegisterUserDTO): Promise<void>;
+export interface CognitoRegisterPort extends InputPort <RegisterUserDTO, RegisterUserResponseDTO> {
+  handle(input: RegisterUserDTO): Promise<RegisterUserResponseDTO>;
 }

@@ -16,7 +16,7 @@ export class ApiGatewayMapper {
         requestId: apiGatewayRequest.getContext().requestId,
         identity: {
           source: apiGatewayRequest.getContext().identity.sourceIp,
-          sub: apiGatewayRequest.getContext().authorizer["user_id"],
+          sub: apiGatewayRequest.getContext().authorizer?.["user_id"],
         },
       },
     });
