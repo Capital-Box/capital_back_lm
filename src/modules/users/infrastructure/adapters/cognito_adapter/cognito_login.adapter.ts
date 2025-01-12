@@ -1,55 +1,65 @@
 import {
-    AdminInitiateAuthCommand,
-    CognitoIdentityProviderClient
+  AdminInitiateAuthCommand,
+  CognitoIdentityProviderClient,
 } from "@aws-sdk/client-cognito-identity-provider";
 import { CognitoLoginPort } from "../../ports/cognito_login.port";
-import { LoginUserRequestDTO, LoginUserResponseDTO } from "../../dtos/login_user.dto";
+import {
+  LoginUserRequestDTO,
+  LoginUserResponseDTO,
+} from "../../dtos/login_user.dto";
 
 export class CognitoLoginAdapter implements CognitoLoginPort {
   private cognitoClient: CognitoIdentityProviderClient;
 
-  constructor(private readonly userPoolId: string, private readonly clientId: string) {
-      this.cognitoClient = new CognitoIdentityProviderClient({});
+  constructor(
+    private readonly userPoolId: string,
+    private readonly clientId: string
+  ) {
+    this.cognitoClient = new CognitoIdentityProviderClient({});
   }
 
-  async handle(user: LoginUserRequestDTO): Promise<LoginUserResponseDTO> {
+  async handle(input: LoginUserRequestDTO): Promise<LoginUserResponseDTO> {
+    const { email, password } = input;
+
+    if (!email || !password) {
+      throw new Error("Email and password are required.");
+    }
+
+    try {
       const command = new AdminInitiateAuthCommand({
-          UserPoolId: this.userPoolId,
-          ClientId: this.clientId,
-          AuthFlow: "ADMIN_USER_PASSWORD_AUTH",
-          AuthParameters: {
-              USERNAME: user.username,
-              PASSWORD: user.password,
-          },
+        UserPoolId: this.userPoolId,
+        ClientId: this.clientId,
+        AuthFlow: "ADMIN_USER_PASSWORD_AUTH",
+        AuthParameters: {
+          USERNAME: email,
+          PASSWORD: password,
+        },
       });
 
       const response = await this.cognitoClient.send(command);
 
+      console.log(response);
+
       if (!response.AuthenticationResult) {
-          throw new Error("Login failed: No authentication result received.");
+        throw new Error("Login failed.");
       }
 
-      return {
-          accessToken: response.AuthenticationResult.AccessToken || "",
-          refreshToken: response.AuthenticationResult.RefreshToken || "",
-          idToken: response.AuthenticationResult.IdToken || "",
-      };
+     return new LoginUserResponseDTO(
+       response.AuthenticationResult.AccessToken || "",
+       response.AuthenticationResult.RefreshToken || "",
+       response.AuthenticationResult.IdToken || "",
+     )
+    } catch (error: any) {
+      if (error.name === "NotAuthorizedException") {
+        throw new Error("Invalid email or password.");
+      }
+      if (error.name === "UserNotFoundException") {
+        throw new Error("User does not exist.");
+      }
+      throw new Error(`Login failed: ${error.message}`);
+    }
   }
-
 }
-
-
-// async register(username: string, password: string, email: string): Promise<void> {
-//     const command = new AdminCreateUserCommand({
-//         UserPoolId: this.userPoolId,
-//         Username: username,
-//         UserAttributes: [{ Name: "email", Value: email }],
-//         TemporaryPassword: password,
-//     });
-
-//     await this.cognitoClient.send(command);
-// }
-
 
 // async refreshToken(refreshToken: string): Promise<{ accessToken: string; idToken: string }> {
 //     const command = new AdminInitiateAuthCommand({

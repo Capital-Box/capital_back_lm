@@ -10,7 +10,7 @@ export class RegisterUserRequestDTO {
 
 export class RegisterUserResponseDTO {
   constructor(
-    public readonly userId: string,
-    public readonly userName: string
+    public readonly email: string,
+    public readonly message: string
   ) {}
 }

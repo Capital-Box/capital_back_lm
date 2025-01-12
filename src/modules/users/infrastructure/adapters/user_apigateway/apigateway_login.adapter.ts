@@ -17,19 +17,32 @@ export class LoginApiGatewayAdapter
   async invoke(request: RequestDTO): Promise<ResponseDTO> {
     const response = new ResponseDTO();
     try {
-      const userData = request.getBody<LoginUserRequestDTO>()
+      const loginData = request.getBody<LoginUserRequestDTO>()
         .data as ICreateResource<LoginUserRequestDTO>;
-      const user = await this.loginUserUseCase.invoke(userData.attributes);
+
+      const loginResult = await this.loginUserUseCase.invoke(
+        loginData.attributes
+      );
+
       response.setData({
-        id: user.idToken as string,
-        type: "accessToken",
+        id: loginResult.idToken as string,
+        type: "login",
         attributes: {
-          access_token: user.accessToken,
+          access_token: loginResult.accessToken,
+          refresh_token: loginResult.refreshToken,
         },
       });
       response.setStatusCode(200);
     } catch (err) {
       response.setStatusCode(401);
+      response.setErrors([
+        {
+          id: "1",
+          title: "Login Error",
+          code: "LogInError",
+          detail: (err as any).message,
+        },
+      ]);
     } finally {
       return response;
     }

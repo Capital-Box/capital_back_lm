@@ -1,6 +1,7 @@
 import {
   AdminAddUserToGroupCommand,
   AdminCreateUserCommand,
+  AdminSetUserPasswordCommand,
   CognitoIdentityProviderClient,
 } from "@aws-sdk/client-cognito-identity-provider";
 import { CognitoRegisterPort } from "../../ports/cognito_register.port";
@@ -29,6 +30,8 @@ export class CognitoRegisterAdapter implements CognitoRegisterPort {
     }
 
     try {
+
+      // Step 1: Create the user without sending a temporary password email
       const createUserCommand = new AdminCreateUserCommand({
         UserPoolId: this.userPoolId,
         Username: email,
@@ -44,11 +47,22 @@ export class CognitoRegisterAdapter implements CognitoRegisterPort {
               }))
             : []),
         ],
+        MessageAction: "SUPPRESS",
       });
       
-      const createUserResponse = await this.cognitoClient.send(createUserCommand);
+      await this.cognitoClient.send(createUserCommand);
 
-      // Agregar al grupo si se proporciona un rol
+      // Step 2: Set Password as permanent
+      const setPasswordCommand = new AdminSetUserPasswordCommand({
+        UserPoolId: this.userPoolId,
+        Username: email,
+        Password: password,
+        Permanent: true,
+      });
+
+      await this.cognitoClient.send(setPasswordCommand);
+
+      //Step 3: Add user to group
       if (role) {
         const groupName = this.mapRoleToGroupName(role);
         const addGroupCommand = new AdminAddUserToGroupCommand({
@@ -59,16 +73,9 @@ export class CognitoRegisterAdapter implements CognitoRegisterPort {
         await this.cognitoClient.send(addGroupCommand);
       }
 
-      // Retornar información del usuario creado
-      const userId =
-        createUserResponse.User?.Attributes?.find(
-          (attr) => attr.Name === "sub"
-        )?.Value || "";
+      // Step 4: Return Success Response
+      return new RegisterUserResponseDTO(email, "User successfully registered.");
 
-      return new RegisterUserResponseDTO(
-        userId,
-        createUserResponse.User?.Username || ""
-      );
     } catch (error: any) {
       // Manejo de errores específicos
       if (error.name === "UsernameExistsException") {

@@ -1,6 +1,6 @@
 export class LoginUserRequestDTO {
   constructor(
-    public readonly username: string,
+    public readonly email: string,
     public readonly password: string
   ) {}
 }
@@ -8,7 +8,7 @@ export class LoginUserRequestDTO {
 export class LoginUserResponseDTO {
   constructor(
     public readonly accessToken: string,
-    public readonly refreshToken?: string,
-    public readonly idToken?: string
+    public readonly refreshToken: string,
+    public readonly idToken: string
   ) {}
 }
