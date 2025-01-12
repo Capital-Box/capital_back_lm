@@ -26,10 +26,11 @@ export class RegisterApiGatewayAdapter
         await this.registerUserUseCase.invoke(userData.attributes);
 
       response.setData({
-        id: user.userId,
+        id: user.email,
         type: "User",
         attributes: {
-          name: `${user.userName} created!`,
+          email: user.email,
+          message: user.message,
         },
       });
       response.setStatusCode(201);

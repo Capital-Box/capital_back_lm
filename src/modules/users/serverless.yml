@@ -111,3 +111,14 @@ functions:
       - http:
           path: register
           method: post
+  refreshToken:
+    handler: handler.refreshToken
+    environment:
+      COGNITO_CLIENT_ID:
+        Ref: UserPoolClient
+      COGNITO_USER_POOL_ID:
+        Ref: UserPool
+    events:
+      - http:
+          path: refresh-token
+          method: post

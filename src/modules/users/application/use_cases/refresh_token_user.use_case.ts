@@ -1,12 +1,19 @@
-// import { IUseCase } from '../../../../lib/application/interfaces/use_case.interface';
+import { IUseCase } from "../../../../lib/application/interfaces/use_case.interface";
+import { CognitoRefreshTokenAdapter } from "../../infrastructure/adapters/cognito_adapter/cognito_refresh_token";
+import {
+  RefreshUserTokenRequestDTO,
+  RefreshUserTokenResponseDTO,
+} from "../../infrastructure/dtos/refresh_token_user.dto";
 
+export class RefreshUserTokenUseCase
+  implements
+    IUseCase<RefreshUserTokenRequestDTO, Promise<RefreshUserTokenResponseDTO>>
+{
+  constructor(private readonly cognitoAdapter: CognitoRefreshTokenAdapter) {}
 
-
-// export class RefreshUserTokenUseCase implements IUseCase<RefreshUserTokenRequestDTO, Promise<RefreshUserTokenResponseDTO>> {
-//     constructor(private readonly cognitoAdapter: CognitoAuthAdapter) {}
-
-//     async invoke(input: RefreshUserTokenRequestDTO ): Promise<RefreshUserTokenResponseDTO> {
-//         const token = await this.cognitoAdapter.refreshToken(input.refreshToken);
-//         return new RefreshUserTokenResponseDTO(token.accessToken, token.refreshToken, token.idToken);        
-//     }
-// }
+  async invoke(
+    input: RefreshUserTokenRequestDTO
+  ): Promise<RefreshUserTokenResponseDTO> {
+    return this.cognitoAdapter.handle(input);
+  }
+}

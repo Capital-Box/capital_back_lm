@@ -5,7 +5,7 @@ export class RefreshUserTokenRequestDTO {
 export class RefreshUserTokenResponseDTO {
     constructor(
         public readonly accessToken: string,
-        public readonly refreshToken?: string,
-        public readonly idToken?: string
+        public readonly idToken: string,
+        public readonly refreshToken: string,
     ) {}
     }
