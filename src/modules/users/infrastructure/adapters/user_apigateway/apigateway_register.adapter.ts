@@ -19,14 +19,15 @@ export class RegisterApiGatewayAdapter extends ApiGatewayAdapter implements ApiG
       const user = await this.registerUserUseCase.invoke(userData.attributes);
       response.setData({
         id: user.id_token as string,
-        type: "accessToken",
+        type: "User",
         attributes: {
           access_token: user.access_token,
         },
       });
-      response.setStatusCode(200);
+      response.setStatusCode(201);
     } catch (err) {
-      response.setStatusCode(401);
+      response.setStatusCode(400);
+      response.setErrors([{ id: "1", title: "Registration Error", code: "RegistrationError", detail: (err as any).message }]);
     } finally {
       return response;
     }

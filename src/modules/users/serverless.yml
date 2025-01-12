@@ -11,12 +11,25 @@ provider:
   architecture: arm64
 
   # Logs Configs
-  logRetentionInDays: 1
-enviroment:
+  logRetentionInDays: 7
+  
+  # IAM role
+  iam:
+    role:
+      statements:
+        - Effect: Allow
+          Action:
+            - cognito-idp:AdminCreateUser
+            - cognito-idp:AdminAddUserToGroup
+          Resource:
+            - !Sub arn:aws:cognito-idp:${AWS::Region}:${AWS::AccountId}:userpool/${UserPool}
+
+environment:
   COGNITO_CLIENT_ID:
     Ref: UserPoolClient
   COGNITO_USER_POOL_ID:
     Ref: UserPool
+
 resources:
   Resources:
     UserPool: 
@@ -43,20 +56,22 @@ resources:
             Required: true
             AttributeDataType: String
             Mutable: true
-          - Name: phone_number
-            Required: true
+          - Name: city
             AttributeDataType: String
             Mutable: true
+
     UserGroupAdmin:
       Type: AWS::Cognito::UserPoolGroup
       Properties:
         GroupName: ${self:service}-admin-group
         UserPoolId: !Ref UserPool
+
     UserGroupDriver:
       Type: AWS::Cognito::UserPoolGroup
       Properties:
         GroupName: ${self:service}-driver-group
         UserPoolId: !Ref UserPool    
+
     UserPoolClient:
       Type: AWS::Cognito::UserPoolClient
       Properties:
@@ -64,20 +79,31 @@ resources:
         UserPoolId: !Ref UserPool
         GenerateSecret: false
         ExplicitAuthFlows:
-          - USER_PASSWORD_AUTH
+          - ALLOW_ADMIN_USER_PASSWORD_AUTH
+          - ALLOW_USER_PASSWORD_AUTH
+          - ALLOW_REFRESH_TOKEN_AUTH
+
 functions:
   login:
     handler: handler.login
+    environment:
+      COGNITO_CLIENT_ID:
+        Ref: UserPoolClient
+      COGNITO_USER_POOL_ID:
+        Ref: UserPool
     events:
       - http:
           path: login
           method: post
+
   register:
     handler: handler.register
+    environment:
+      COGNITO_CLIENT_ID:
+        Ref: UserPoolClient
+      COGNITO_USER_POOL_ID:
+        Ref: UserPool
     events:
       - http:
           path: register
           method: post
-  
-
-

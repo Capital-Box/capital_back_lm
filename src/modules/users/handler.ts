@@ -6,15 +6,35 @@ import { RegisterUserUseCase } from "./application/use_cases/register_user.use_c
 import { RegisterApiGatewayAdapter } from "./infrastructure/adapters/user_apigateway/apigateway_register.adapter";
 import { CognitoRegisterAdapter } from "./infrastructure/adapters/cognito_adapter/congito_register.adapter";
 
-export const login = async (event: APIGatewayProxyEventBase<{ user_id?: string }>): Promise<APIGatewayProxyResultV2> => {
-  const adapter = new LoginApiGatewayAdapter(new LoginUserUseCase(new CognitoLoginAdapter(process.env.COGNITO_USER_POOL_ID , process.env.COGNITO_CLIENT_ID )));
-  return await adapter.handle(event)
-}
+export const login = async (
+  event: APIGatewayProxyEventBase<{ user_id?: string }>
+): Promise<APIGatewayProxyResultV2> => {
+  const adapter = new LoginApiGatewayAdapter(
+    new LoginUserUseCase(
+      new CognitoLoginAdapter(
+        process.env.COGNITO_USER_POOL_ID!,
+        process.env.COGNITO_CLIENT_ID!
+      )
+    )
+  );
+  return await adapter.handle(event);
+};
 
 export const register = async (event: APIGatewayProxyEventBase<{ user_id?: string }>): Promise<APIGatewayProxyResultV2> => {
-  const adapter = new RegisterApiGatewayAdapter(new RegisterUserUseCase(new CognitoRegisterAdapter(process.env.COGNITO_USER_POOL_ID , process.env.COGNITO_CLIENT_ID )));
-  return await adapter.handle(event)
-}
+  const userPoolId = process.env.COGNITO_USER_POOL_ID;
+  const clientId = process.env.COGNITO_CLIENT_ID;
+
+  if (!userPoolId || !clientId) {
+    throw new Error("Handler Error - COGNITO_USER_POOL_ID or COGNITO_CLIENT_ID is not set");
+  }
+
+  const adapter = new RegisterApiGatewayAdapter(new RegisterUserUseCase(
+    new CognitoRegisterAdapter(userPoolId, clientId)
+  ));
+
+  return await adapter.handle(event);
+};
+
 
 // export const refreshToken = async (event: APIGatewayProxyEventBase<{ user_id?: string }>): Promise<APIGatewayProxyResultV2> => {
 //   const adapter = new LoginApiGatewayAdapter(new refreshToken(new CognitoLoginAdapter(process.env.COGNITO_USER_POOL_ID , process.env.COGNITO_CLIENT_ID )));
