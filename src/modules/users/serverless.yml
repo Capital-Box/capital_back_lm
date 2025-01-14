@@ -23,6 +23,9 @@ provider:
             - cognito-idp:AdminSetUserPassword
             - cognito-idp:AdminAddUserToGroup
             - cognito-idp:AdminInitiateAuth
+            - cognito-idp:AdminUpdateUserAttributes
+            - cognito-idp:ListUsers
+            - cognito-idp:AdminGetUser
 
           Resource:
             - !Sub arn:aws:cognito-idp:${AWS::Region}:${AWS::AccountId}:userpool/${UserPool}
@@ -63,6 +66,9 @@ resources:
           - Name: city
             AttributeDataType: String
             Mutable: true
+          - Name: isDeleted
+            AttributeDataType: Boolean
+            Mutable: true
 
     UserGroupAdmin:
       Type: AWS::Cognito::UserPoolGroup
@@ -99,7 +105,6 @@ functions:
       - http:
           path: login
           method: post
-
   register:
     handler: handler.register
     environment:
@@ -122,3 +127,38 @@ functions:
       - http:
           path: refresh-token
           method: post
+  deleteUser:
+      handler: handler.edit
+      environment:
+        COGNITO_USER_POOL_ID:
+          Ref: UserPool
+      events:
+        - http:
+            path: edit
+            method: post
+  listUsers:
+      handler: handler.listUsers
+      environment:
+        COGNITO_USER_POOL_ID:
+          Ref: UserPool
+      events:
+        - http:
+            path: listUsers
+            method: get
+  getUserById:
+    handler: handler.getUserById
+    environment:
+      COGNITO_USER_POOL_ID:
+        Ref: UserPool
+    events:
+      - http:
+          path: users/{user_id}
+          method: get
+  updateUser:
+    handler: handler.edit
+    environment:
+      COGNITO_USER_POOL_ID:
+        Ref: UserPool
+    events:
+      - http:
+          path: edit

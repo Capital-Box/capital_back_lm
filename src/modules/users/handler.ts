@@ -7,7 +7,16 @@ import { RegisterApiGatewayAdapter } from "./infrastructure/adapters/user_apigat
 import { CognitoRegisterAdapter } from "./infrastructure/adapters/cognito_adapter/congito_register.adapter";
 import { RefreshUserTokenUseCase } from "./application/use_cases/refresh_token_user.use_case";
 import { CognitoRefreshTokenAdapter } from "./infrastructure/adapters/cognito_adapter/cognito_refresh_token";
-import { RefreshTokenApiGatewayAdapter } from "./infrastructure/adapters/user_apigateway/apigateway_refresh_token";
+import { RefreshTokenApiGatewayAdapter } from "./infrastructure/adapters/user_apigateway/apigateway_refresh_token.adapter";
+import { EditUserUseCase } from "./application/use_cases/edit_user.use_case";
+import { EditApiGatewayAdapter } from "./infrastructure/adapters/user_apigateway/apigateway_edit.adapter";
+import { CognitoEditAdapter } from "./infrastructure/adapters/cognito_adapter/cognito_edit.adapter";
+import { CognitoGetAllUsersAdapter } from "./infrastructure/adapters/cognito_adapter/cognito_get_all_users.adapter";
+import { GetAllUsersUseCase } from "./application/use_cases/get_all_users.use_case";
+import { ApiGatewayGetAllUsersAdapter } from "./infrastructure/adapters/user_apigateway/apigateway_get_all_users.adapter";
+import { GetUserByIdUseCase } from "./application/use_cases/get_user_by_id.use_case";
+import { CognitoGetUserByIdAdapter } from "./infrastructure/adapters/cognito_adapter/cognito_get_user_by_id.adapter";
+import { ApiGatewayGetUserByIdAdapter } from "./infrastructure/adapters/user_apigateway/apigateway_get_user_by_id.adapter";
 
 export const login = async (
   event: APIGatewayProxyEventBase<{ user_id?: string }>
@@ -26,8 +35,8 @@ export const login = async (
 export const register = async (
   event: APIGatewayProxyEventBase<{ user_id?: string }>
 ): Promise<APIGatewayProxyResultV2> => {
-  const userPoolId = process.env.COGNITO_USER_POOL_ID;
-  const clientId = process.env.COGNITO_CLIENT_ID;
+  const userPoolId = process.env.COGNITO_USER_POOL_ID!;
+  const clientId = process.env.COGNITO_CLIENT_ID!;
 
   if (!userPoolId || !clientId) {
     throw new Error(
@@ -54,4 +63,37 @@ export const refreshToken = async (
     )
   );
   return adapter.handle(event);
+};
+
+export const edit = async (
+  event: APIGatewayProxyEventBase<{ user_id?: string }>
+): Promise<APIGatewayProxyResultV2> => {
+  const adapter = new EditApiGatewayAdapter(
+    new EditUserUseCase(
+      new CognitoEditAdapter(process.env.COGNITO_USER_POOL_ID!)
+    )
+  );
+  return await adapter.handle(event);
+};
+
+export const listUsers = async (
+  event: APIGatewayProxyEventBase<{ user_id?: string }>
+): Promise<APIGatewayProxyResultV2> => {
+  const adapter = new ApiGatewayGetAllUsersAdapter(
+    new GetAllUsersUseCase(
+      new CognitoGetAllUsersAdapter(process.env.COGNITO_USER_POOL_ID!)
+    )
+  );
+  return await adapter.handle(event);
+};
+
+export const getUserById = async (
+  event: APIGatewayProxyEventBase<{ user_id?: string }>
+): Promise<APIGatewayProxyResultV2> => {
+  const adapter = new ApiGatewayGetUserByIdAdapter(
+    new GetUserByIdUseCase(
+      new CognitoGetUserByIdAdapter(process.env.COGNITO_USER_POOL_ID!)
+    )
+  );
+  return await adapter.handle(event);
 };
