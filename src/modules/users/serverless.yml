@@ -69,6 +69,9 @@ resources:
           - Name: isDeleted
             AttributeDataType: Boolean
             Mutable: true
+          - Name: role
+            AttributeDataType: String
+            Mutable: true
 
     UserGroupAdmin:
       Type: AWS::Cognito::UserPoolGroup
@@ -114,7 +117,7 @@ functions:
         Ref: UserPool
     events:
       - http:
-          path: register
+          path: users/register
           method: post
   refreshToken:
     handler: handler.refreshToken
@@ -125,7 +128,7 @@ functions:
         Ref: UserPool
     events:
       - http:
-          path: refresh-token
+          path: users/refresh-token
           method: post
   deleteUser:
       handler: handler.edit
@@ -134,7 +137,7 @@ functions:
           Ref: UserPool
       events:
         - http:
-            path: edit
+            path: users/edit
             method: post
   listUsers:
       handler: handler.listUsers
@@ -143,7 +146,7 @@ functions:
           Ref: UserPool
       events:
         - http:
-            path: listUsers
+            path: users/listUsers
             method: get
   getUserById:
     handler: handler.getUserById
@@ -161,4 +164,5 @@ functions:
         Ref: UserPool
     events:
       - http:
-          path: edit
+          path: users/edit
+          method: put

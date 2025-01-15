@@ -17,6 +17,8 @@ import { ApiGatewayGetAllUsersAdapter } from "./infrastructure/adapters/user_api
 import { GetUserByIdUseCase } from "./application/use_cases/get_user_by_id.use_case";
 import { CognitoGetUserByIdAdapter } from "./infrastructure/adapters/cognito_adapter/cognito_get_user_by_id.adapter";
 import { ApiGatewayGetUserByIdAdapter } from "./infrastructure/adapters/user_apigateway/apigateway_get_user_by_id.adapter";
+import { validateAuthToken } from "../../lib/infrastructure/middlewares/protectEndpoint.middleware";
+import { checkUserRole } from "../../lib/infrastructure/middlewares/checkUserRole.middleware";
 
 export const login = async (
   event: APIGatewayProxyEventBase<{ user_id?: string }>
@@ -35,20 +37,40 @@ export const login = async (
 export const register = async (
   event: APIGatewayProxyEventBase<{ user_id?: string }>
 ): Promise<APIGatewayProxyResultV2> => {
-  const userPoolId = process.env.COGNITO_USER_POOL_ID!;
-  const clientId = process.env.COGNITO_CLIENT_ID!;
+  const authHeader =
+    event.headers.Authorization || (event.headers.authorization as string);
 
-  if (!userPoolId || !clientId) {
-    throw new Error(
-      "Handler Error - COGNITO_USER_POOL_ID or COGNITO_CLIENT_ID is not set"
+  try {
+    const user = await validateAuthToken(authHeader);
+
+    console.log("user", user);
+
+    // Verifica si el usuario es administrador
+    // checkUserRole(user, ["ADMIN"]);
+
+    // Continúa con la lógica de tu endpoint
+    const userPoolId = process.env.COGNITO_USER_POOL_ID!;
+    const clientId = process.env.COGNITO_CLIENT_ID!;
+
+    if (!userPoolId || !clientId) {
+      throw new Error(
+        "Handler Error - COGNITO_USER_POOL_ID or COGNITO_CLIENT_ID is not set"
+      );
+    }
+
+    const adapter = new RegisterApiGatewayAdapter(
+      new RegisterUserUseCase(new CognitoRegisterAdapter(userPoolId, clientId))
     );
+
+    return await adapter.handle(event);
+  } catch (error: any) {
+    return {
+      statusCode: 401,
+      body: JSON.stringify({
+        message: error.message || "Unauthorized",
+      }),
+    };
   }
-
-  const adapter = new RegisterApiGatewayAdapter(
-    new RegisterUserUseCase(new CognitoRegisterAdapter(userPoolId, clientId))
-  );
-
-  return await adapter.handle(event);
 };
 
 export const refreshToken = async (
