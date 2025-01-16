@@ -23,14 +23,13 @@ export class CognitoRegisterAdapter implements CognitoRegisterPort {
   async handle(
     input: RegisterUserRequestDTO
   ): Promise<RegisterUserResponseDTO> {
-    const { name, password, email, attributes, role } = input;
+    const { name, password, email, role, city } = input;
 
     if (!name || !email || !password) {
       throw new Error("Username, email, and password are required.");
     }
 
     try {
-
       // Step 1: Create the user without sending a temporary password email
       const createUserCommand = new AdminCreateUserCommand({
         UserPoolId: this.userPoolId,
@@ -40,16 +39,12 @@ export class CognitoRegisterAdapter implements CognitoRegisterPort {
           { Name: "email", Value: email },
           { Name: "email_verified", Value: "true" },
           { Name: "name", Value: name },
-          ...(attributes
-            ? Object.entries(attributes).map(([Name, Value]) => ({
-                Name,
-                Value,
-              }))
-            : []),
+          { Name: "custom:role", Value: role || "USER" },
+          { Name: "custom:city", Value: city || "CORDOBA" },
         ],
         MessageAction: "SUPPRESS",
       });
-      
+
       await this.cognitoClient.send(createUserCommand);
 
       // Step 2: Set Password as permanent
@@ -68,14 +63,16 @@ export class CognitoRegisterAdapter implements CognitoRegisterPort {
         const addGroupCommand = new AdminAddUserToGroupCommand({
           UserPoolId: this.userPoolId,
           Username: email,
-          GroupName: groupName 
+          GroupName: groupName,
         });
         await this.cognitoClient.send(addGroupCommand);
       }
 
       // Step 4: Return Success Response
-      return new RegisterUserResponseDTO(email, "User successfully registered.");
-
+      return new RegisterUserResponseDTO(
+        email,
+        "User successfully registered."
+      );
     } catch (error: any) {
       // Manejo de errores específicos
       if (error.name === "UsernameExistsException") {
