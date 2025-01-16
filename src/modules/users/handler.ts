@@ -43,10 +43,8 @@ export const register = async (
   try {
     const user = await validateAuthToken(authHeader);
 
-    console.log("user", user);
-
     // Verifica si el usuario es administrador
-    // checkUserRole(user, ["ADMIN"]);
+    checkUserRole(user, ["ADMIN"]);
 
     // Continúa con la lógica de tu endpoint
     const userPoolId = process.env.COGNITO_USER_POOL_ID!;
