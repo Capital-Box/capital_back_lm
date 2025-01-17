@@ -10,6 +10,7 @@
   "license": "ISC",
   "description": "",
   "dependencies": {
-    "@aws-sdk/client-cognito-identity": "^3.726.1"
+    "@aws-sdk/client-cognito-identity": "^3.726.1",
+    "@aws-sdk/client-cognito-identity-provider": "^3.730.0"
   }
 }
