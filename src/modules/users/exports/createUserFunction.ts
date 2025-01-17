@@ -8,7 +8,7 @@ const userApiGatewayAdapter = new UserApiGatewayAdapter({
   service: userService,
 });
 
-export const register = async (req: APIGatewayProxyEvent) => {
+export const handle = async (req: APIGatewayProxyEvent) => {
   const requestDTO = new RegisterUserRequestDTO(req);
   const responseDTO = await userApiGatewayAdapter.createUser(requestDTO);
   return responseDTO.send();

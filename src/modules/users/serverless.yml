@@ -12,7 +12,7 @@ provider:
 
   # Logs Configs
   logRetentionInDays: 7
-  
+
   # IAM role
   iam:
     role:
@@ -30,7 +30,6 @@ provider:
           Resource:
             - !Sub arn:aws:cognito-idp:${AWS::Region}:${AWS::AccountId}:userpool/${UserPool}
 
-
 environment:
   COGNITO_CLIENT_ID:
     Ref: UserPoolClient
@@ -39,7 +38,7 @@ environment:
 
 resources:
   Resources:
-    UserPool: 
+    UserPool:
       Type: AWS::Cognito::UserPool
       Properties:
         UserPoolName: ${self:service}-user-pool
@@ -83,7 +82,7 @@ resources:
       Type: AWS::Cognito::UserPoolGroup
       Properties:
         GroupName: ${self:service}-driver-group
-        UserPoolId: !Ref UserPool    
+        UserPoolId: !Ref UserPool
 
     UserPoolClient:
       Type: AWS::Cognito::UserPoolClient
@@ -109,7 +108,7 @@ functions:
           path: login
           method: post
   register:
-    handler: handler.register
+    handler: exports/createUserFunction.handle
     environment:
       COGNITO_CLIENT_ID:
         Ref: UserPoolClient
@@ -131,23 +130,23 @@ functions:
           path: users/refresh-token
           method: post
   deleteUser:
-      handler: handler.edit
-      environment:
-        COGNITO_USER_POOL_ID:
-          Ref: UserPool
-      events:
-        - http:
-            path: users/edit
-            method: post
+    handler: handler.edit
+    environment:
+      COGNITO_USER_POOL_ID:
+        Ref: UserPool
+    events:
+      - http:
+          path: users/edit
+          method: post
   listUsers:
-      handler: handler.listUsers
-      environment:
-        COGNITO_USER_POOL_ID:
-          Ref: UserPool
-      events:
-        - http:
-            path: users/listUsers
-            method: get
+    handler: handler.listUsers
+    environment:
+      COGNITO_USER_POOL_ID:
+        Ref: UserPool
+    events:
+      - http:
+          path: users/listUsers
+          method: get
   getUserById:
     handler: handler.getUserById
     environment:
