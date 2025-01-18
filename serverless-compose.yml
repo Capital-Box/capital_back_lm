@@ -1,3 +1,5 @@
 services:
   users: 
     path: src/modules/users
+  orders:
+    path: src/modules/orders

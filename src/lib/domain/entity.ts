@@ -1,7 +1,9 @@
+import { Event } from "./event";
+
 export class Entity {
   private events: Event[] = [];
 
-  constructor() {}
+  constructor() { }
 
   protected addEvent(event: Event): void {
     this.events.push(event);
