@@ -3,6 +3,8 @@ import { OrderSubStatuses } from "modules/orders/domain/enums/order_sub_statuses
 
 interface OrderConstructor {
   id: string;
+  externalProvider: string | null;
+  externalId: string | null;
   mainStatus: OrderMainStatuses;
   subStatus: OrderSubStatuses;
   createdDate: Date;
@@ -11,6 +13,8 @@ interface OrderConstructor {
 
 export class OrderDTO {
   private readonly id: string;
+  private readonly externalProvider: string | null;
+  private readonly externalId: string | null;
   private readonly mainStatus: OrderMainStatuses;
   private readonly subStatus: OrderSubStatuses;
   private readonly createdDate: Date;
@@ -18,6 +22,8 @@ export class OrderDTO {
 
   constructor(order: OrderConstructor) {
     this.id = order.id;
+    this.externalProvider = order.externalProvider;
+    this.externalId = order.externalId
     this.mainStatus = order.mainStatus;
     this.subStatus = order.subStatus;
     this.createdDate = order.createdDate;
@@ -26,6 +32,14 @@ export class OrderDTO {
 
   getId(): string {
     return this.id;
+  }
+
+  getExternalProvider(): string | null {
+    return this.externalProvider;
+  }
+
+  getExternalId(): string | null {
+    return this.externalId;
   }
 
   getMainStatus(): OrderMainStatuses {

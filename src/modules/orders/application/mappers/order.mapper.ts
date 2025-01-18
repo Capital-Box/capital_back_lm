@@ -5,6 +5,8 @@ export class OrderMapper {
   static toDTO(order: Order): OrderDTO {
     return new OrderDTO({
       id: order.getId(),
+      externalProvider: order.getExternalProvider(),
+      externalId: order.getExternalId(),
       mainStatus: order.getMainStatus(),
       subStatus: order.getSubStatus(),
       createdDate: order.getCreatedDate(),

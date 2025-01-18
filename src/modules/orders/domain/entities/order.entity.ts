@@ -4,9 +4,12 @@ import { OrderMainStatuses } from "../enums/order_statuses.enum";
 import { OrderSubStatuses } from "../enums/order_sub_statuses.enum";
 import { Entity } from "@lib/domain/entity";
 import { OrderChangeStatusEvent } from "../events/order_change_status.event";
+import { ExternalProvider } from "../value_objects/external_provider.vo";
+import { ExternalProviders } from "../enums/external_providers.enum";
 
 interface OrderConstructor {
   id: UUID;
+  externalProvider: ExternalProvider | null;
   status: OrderStatus;
   createdDate: Date;
   lastUpdated: Date;
@@ -14,6 +17,7 @@ interface OrderConstructor {
 
 export class Order extends Entity {
   private readonly id: UUID;
+  private readonly externalProvider: ExternalProvider | null;
   private readonly status: OrderStatus;
   private readonly createdDate: Date;
   private readonly lastUpdated: Date;
@@ -21,6 +25,7 @@ export class Order extends Entity {
   constructor(order: OrderConstructor) {
     super();
     this.id = order.id;
+    this.externalProvider = order.externalProvider;
     this.status = order.status;
     this.createdDate = order.createdDate;
     this.lastUpdated = order.lastUpdated;
@@ -28,6 +33,14 @@ export class Order extends Entity {
 
   getId(): string {
     return this.id.getUUID();
+  }
+
+  getExternalProvider(): ExternalProviders | null {
+    return this.externalProvider?.getExternalProvider() || null;
+  }
+
+  getExternalId(): string | null {
+    return this.externalProvider?.getExternalId() || null;
   }
 
   getMainStatus(): OrderMainStatuses {
