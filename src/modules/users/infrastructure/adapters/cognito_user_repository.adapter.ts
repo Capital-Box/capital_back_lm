@@ -1,12 +1,10 @@
-import { User } from "modules/users/domain/entities/user.entity";
-import { UserRepositoryPort } from "../ports/user_repository.port";
 import {
-  AdminAddUserToGroupCommand,
   AdminCreateUserCommand,
   AdminSetUserPasswordCommand,
-  CognitoIdentityProviderClient,
+  CognitoIdentityProviderClient
 } from "@aws-sdk/client-cognito-identity-provider";
-import { Roles } from "modules/users/domain/enums/roles.enum";
+import { User } from "modules/users/domain/entities/user.entity";
+import { UserRepositoryPort } from "../ports/user_repository.port";
 
 interface CognitoUserRepositoryDependencies {
   userPoolId: string;
@@ -24,11 +22,6 @@ export class CognitoUserRepository implements UserRepositoryPort {
     this.userPoolId = dependencies.userPoolId;
     this.clientId = dependencies.clientId;
   }
-
-  private readonly roleGroups: { [key in Roles]: string } = {
-    [Roles.ADMIN]: "users-admin-group",
-    [Roles.USER]: "users-driver-group",
-  };
 
   async save(user: User): Promise<User> {
     try {
@@ -55,14 +48,6 @@ export class CognitoUserRepository implements UserRepositoryPort {
       });
       await this.cognitoClient.send(setPasswordCommand);
 
-      const addUserToGroupCommand = new AdminAddUserToGroupCommand({
-        UserPoolId: this.userPoolId,
-        Username: user.getEmail(),
-        GroupName: this.roleGroups[user.getRole()],
-      });
-
-      await this.cognitoClient.send(addUserToGroupCommand);
-
       return user;
     } catch (error: any) {
       if (error.name === "UsernameExistsException") {
@@ -71,4 +56,17 @@ export class CognitoUserRepository implements UserRepositoryPort {
       throw new Error(`Registration failed: ${error.message}`);
     }
   }
+
+  async update(user: User): Promise<User> {
+    throw new Error("Method not implemented.");
+  }
+
+  async delete(id: string): Promise<void> {
+    throw new Error("Method not implemented.");
+  }
+
+  async findById(id: string): Promise<User | null> {
+    throw new Error("Method not implemented.");
+  }
+
 }
