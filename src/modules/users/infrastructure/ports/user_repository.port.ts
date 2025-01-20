@@ -1,3 +1,4 @@
+import { IResponse } from "@lib/infrastructure/dtos/responses/response.dto";
 import { User } from "modules/users/domain/entities/user.entity";
 
 // Conceptualmente esto es correcto? Yo tengo que usar algo de la capa interior entity para definir el contrato de la capa exterior port?
@@ -8,4 +9,5 @@ export interface UserRepositoryPort {
   update(user: User): Promise<User>;
   delete(id: string): Promise<void>;
   findById(id: string): Promise<User | null>;
+  list: () => Promise<User[]>;
 }

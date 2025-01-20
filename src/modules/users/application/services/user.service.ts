@@ -7,6 +7,7 @@ import { UserMapper } from "../mappers/user.mapper";
 import { CreateUserCase } from "../use_cases/create_user.case";
 import { UpdateUserCase } from "../use_cases/update_user.case";
 import { DeleteUserCase } from "../use_cases/delete_user.case";
+import { IResponse } from "@lib/infrastructure/dtos/responses/response.dto";
 
 export class UserService implements CreateUserCase, UpdateUserCase, DeleteUserCase {
   constructor(private readonly userRepository: UserRepositoryPort) {}
@@ -29,7 +30,14 @@ export class UserService implements CreateUserCase, UpdateUserCase, DeleteUserCa
     return UserMapper.toDTO(updatedUser);
   }
 
-  async delete(id: string): Promise<void> {
-    await this.userRepository.delete(id);
+  // Chequear si esta ok
+  async delete(userId: string): Promise<IResponse<Object>>{
+    const deleteUser = await this.userRepository.delete(userId);
+    return deleteUser;
+  }
+
+  async list(): Promise<UserDTO[]> {
+    const users = await this.userRepository.list();
+    return users.map((user) => UserMapper.toDTO(user));
   }
 }

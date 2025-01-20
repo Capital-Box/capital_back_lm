@@ -14,9 +14,10 @@ import {
   IResponse,
   ResponseDTO,
 } from "@lib/infrastructure/dtos/responses/response.dto";
+import { ListUsersCase } from "modules/users/application/use_cases/list_users.case";
 
 interface UserApiGatewayAdapterDependencies {
-  service: CreateUserCase & UpdateUserCase & DeleteUserCase;
+  service: CreateUserCase & UpdateUserCase & DeleteUserCase & ListUsersCase;
 }
 
 export class UserApiGatewayAdapter implements CreateUserPort, UpdateUserPort {
@@ -42,8 +43,13 @@ export class UserApiGatewayAdapter implements CreateUserPort, UpdateUserPort {
     return response;
   }
 
+  //Chequear que este ok
   async updateUser(req: UpdateUserRequestDTO): Promise<UserResponseDTO> {
     req.validatePayload();
+    req.validateParameters();
+
+    // Faltaria verificar que el usuario existe
+
     const reqPayload = req.getPayload().attributes;
     const updateUserDTO = new UpdateUserDTO(reqPayload);
     const userDTO = await this.dependencies.service.update(updateUserDTO);
@@ -60,9 +66,9 @@ export class UserApiGatewayAdapter implements CreateUserPort, UpdateUserPort {
 
   // Chequear que este ok
   async deleteUser(req: DeleteUserRequestDTO): Promise<IResponse<Object>> {
-    req.validatePayload();
+    req.validateParameters();
     const userId = req.getUserId();
-    const deleteUser: Object = await this.dependencies.service.delete(userId);
+    await this.dependencies.service.delete(userId);
     const response = {
       status: HttpStatus.NO_CONTENT,
       payload: {
@@ -74,5 +80,21 @@ export class UserApiGatewayAdapter implements CreateUserPort, UpdateUserPort {
       },
     };
     return response;
+  }
+
+  // Chequear que este ok - Importante aca manejar el tema de los filtrados en cognito
+  async listUsers(): Promise<UserResponseDTO[]> {
+    const userDTOs = await this.dependencies.service.list();
+
+    // Podrías crear un "UserListResponseDTO" si deseas
+    // retornar un array de usuarios en el atributo principal.
+    return new UserResponseDTO({
+      status: HttpStatus.OK,
+      payload: {
+        id: "", // o algún ID simbólico
+        type: "users_list",
+        attributes: userDTOs,
+      },
+    });
   }
 }

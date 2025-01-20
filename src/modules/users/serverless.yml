@@ -126,10 +126,12 @@ functions:
           path: users/{userId}
           method: delete
   listUsers:
-    handler: handler.listUsers
+    handler: exports/listUsersFunction.handle
     environment:
       COGNITO_USER_POOL_ID:
         Ref: UserPool
+      COGNITO_CLIENT_ID:
+        Ref: UserPoolClient
     events:
       - http:
           path: users/listUsers

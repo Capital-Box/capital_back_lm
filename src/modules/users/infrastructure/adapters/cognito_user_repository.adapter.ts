@@ -7,6 +7,7 @@ import {
 } from "@aws-sdk/client-cognito-identity-provider";
 import { User } from "modules/users/domain/entities/user.entity";
 import { UserRepositoryPort } from "../ports/user_repository.port";
+import { IResponse } from "@lib/infrastructure/dtos/responses/response.dto";
 
 interface CognitoUserRepositoryDependencies {
   userPoolId: string;
@@ -111,5 +112,51 @@ export class CognitoUserRepository implements UserRepositoryPort {
 
   async findById(id: string): Promise<User | null> {
     throw new Error("Method not implemented.");
+  }
+
+  async list(): Promise<User[]> {
+    try {
+      // 1. Ejecutar AdminListUsers para traer la lista del pool
+      const command = new AdminListUsersCommand({
+        UserPoolId: this.userPoolId,
+        // Podrías usar Pagination, Filters, etc.
+      });
+
+      const response = await this.cognitoClient.send(command);
+      const cognitoUsers = response.Users || [];
+
+      // 2. Mapear la respuesta a un array de entidades User
+      const domainUsers: User[] = cognitoUsers.map((cUser) => {
+        // Extraer los atributos relevantes
+        // Por ejemplo, "email", "custom:role", "custom:city", "name", etc.
+
+        const email = cUser.Attributes?.find((attr) => attr.Name === "email")?.Value ?? "";
+        const name = cUser.Attributes?.find((attr) => attr.Name === "name")?.Value ?? "";
+        const role = cUser.Attributes?.find((attr) => attr.Name === "custom:role")?.Value ?? "";
+        const city = cUser.Attributes?.find((attr) => attr.Name === "custom:city")?.Value ?? "";
+        
+        // Password no se puede recuperar directamente de Cognito, 
+        // así que podrías setearla como vacía si tu dominio la requiere
+        // o ajustarla según tu lógica
+        const password = "";
+
+        // De acuerdo a tu UserFactory, 
+        // construimos un CreateUserDTO-like o su interfaz
+        // y generamos la entidad.
+        const userEntity = UserFactory.create({
+          username: name,     // O cUser.Username
+          password: password,
+          email: email,
+          role: role,
+          city: city,
+        });
+        
+        return userEntity;
+      });
+
+      return domainUsers;
+    } catch (error: any) {
+      throw new Error("Error listing users from Cognito: " + error.message);
+    }
   }
 }

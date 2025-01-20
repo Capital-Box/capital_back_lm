@@ -12,6 +12,12 @@ export class DeleteUserRequestDTO extends ApiGatewayRequestDTO<IDeleteUserAttrib
         }
     }
 
+    validateParameters(): void {
+        if(!this.getPathParameters()?.userId) {
+            throw new Error("userId is required in the path parameters");
+        }
+    }
+
     getUserId(): string {
         return this.getPathParameters().userId!;
       }
