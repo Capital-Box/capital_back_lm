@@ -1,0 +1,64 @@
+service: auth
+frameworkVersion: 4.4.x
+
+provider:
+  name: aws
+  runtime: nodejs22.x
+  region: us-east-2
+
+  # Lambda Configs
+  memorySize: 512
+  architecture: arm64
+
+  # Logs Configs
+  logRetentionInDays: 7
+
+  iam:
+    role:
+      statements:
+        - Effect: Allow
+          Action:
+            - cognito-idp:AdminInitiateAuth
+            - cognito-idp:AdminCreateUser
+            - cognito-idp:AdminSetUserPassword
+            - cognito-idp:AdminUpdateUserAttributes
+          Resource:
+            - arn:aws:cognito-idp:${opt:region, self:provider.region}:${aws:accountId}:userpool/${self:service}-user-pool
+
+environment:
+  COGNITO_USER_POOL_ID:
+    Ref: UserPool
+  COGNITO_CLIENT_ID:
+    Ref: UserPoolClient
+
+functions:
+  login:
+    handler: exports/loginFunction.handle
+    environment:
+      COGNITO_USER_POOL_ID: ${self:provider.environment.COGNITO_USER_POOL_ID}
+      COGNITO_CLIENT_ID: ${self:provider.environment.COGNITO_CLIENT_ID}
+    events:
+      - http:
+          path: auth/login
+          method: post
+
+  refreshToken:
+    handler: exports/refreshTokenFunction.handle
+    environment:
+      COGNITO_USER_POOL_ID: ${self:provider.environment.COGNITO_USER_POOL_ID}
+      COGNITO_CLIENT_ID: ${self:provider.environment.COGNITO_CLIENT_ID}
+    events:
+      - http:
+          path: auth/refresh-token
+          method: post
+
+resources:
+  Resources:
+    UserPool:
+      Type: AWS::Cognito::UserPool
+      Properties:
+        UserPoolName: ${self:service}-user-pool
+    UserPoolClient:
+      Type: AWS::Cognito::UserPoolClient
+      Properties:
+        ClientName: ${self:service}-user-pool-client

@@ -1,7 +1,9 @@
 import {
   AdminCreateUserCommand,
+  AdminDisableUserCommand,
   AdminSetUserPasswordCommand,
-  CognitoIdentityProviderClient
+  AdminUpdateUserAttributesCommand,
+  CognitoIdentityProviderClient,
 } from "@aws-sdk/client-cognito-identity-provider";
 import { User } from "modules/users/domain/entities/user.entity";
 import { UserRepositoryPort } from "../ports/user_repository.port";
@@ -58,15 +60,56 @@ export class CognitoUserRepository implements UserRepositoryPort {
   }
 
   async update(user: User): Promise<User> {
-    throw new Error("Method not implemented.");
+    try {
+      const updateCommand = new AdminUpdateUserAttributesCommand({
+        UserPoolId: this.userPoolId,
+        Username: user.getEmail(),
+        UserAttributes: [
+          { Name: "email", Value: user.getEmail() },
+          { Name: "name", Value: user.getUserName() },
+          { Name: "custom:role", Value: user.getRole() },
+          { Name: "custom:city", Value: user.getCity() },
+        ],
+      });
+      await this.cognitoClient.send(updateCommand);
+
+      if (user.getPassword()) {
+        const setPasswordCommand = new AdminSetUserPasswordCommand({
+          UserPoolId: this.userPoolId,
+          Username: user.getEmail(),
+          Password: user.getPassword(),
+          Permanent: true,
+        });
+        await this.cognitoClient.send(setPasswordCommand);
+      }
+
+      return user;
+    } catch (error: any) {
+      throw new Error(`Update failed: ${error.message}`);
+    }
   }
 
-  async delete(id: string): Promise<void> {
-    throw new Error("Method not implemented.");
+  async delete(userId: string): Promise<void> {
+    const disableCommand = new AdminDisableUserCommand({
+      UserPoolId: this.userPoolId,
+      Username: userId,
+    });
+    await this.cognitoClient.send(disableCommand);
+
+    const updateCommand = new AdminUpdateUserAttributesCommand({
+      UserPoolId: this.userPoolId,
+      Username: userId,
+      UserAttributes: [
+        {
+          Name: "custom:isDeleted",
+          Value: "true"
+        }
+      ],
+    });
+    await this.cognitoClient.send(updateCommand);
   }
 
   async findById(id: string): Promise<User | null> {
     throw new Error("Method not implemented.");
   }
-
 }

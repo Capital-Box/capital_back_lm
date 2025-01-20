@@ -96,18 +96,7 @@ resources:
           - ALLOW_REFRESH_TOKEN_AUTH
 
 functions:
-  login:
-    handler: handler.login
-    environment:
-      COGNITO_CLIENT_ID:
-        Ref: UserPoolClient
-      COGNITO_USER_POOL_ID:
-        Ref: UserPool
-    events:
-      - http:
-          path: login
-          method: post
-  register:
+  create:
     handler: exports/createUserFunction.handle
     environment:
       COGNITO_CLIENT_ID:
@@ -118,26 +107,24 @@ functions:
       - http:
           path: users/register
           method: post
-  refreshToken:
-    handler: handler.refreshToken
-    environment:
-      COGNITO_CLIENT_ID:
-        Ref: UserPoolClient
-      COGNITO_USER_POOL_ID:
-        Ref: UserPool
-    events:
-      - http:
-          path: users/refresh-token
-          method: post
-  deleteUser:
-    handler: handler.edit
+  update:
+    handler: exports/updateUserFunction.handle
     environment:
       COGNITO_USER_POOL_ID:
         Ref: UserPool
     events:
       - http:
-          path: users/edit
-          method: post
+          path: users/{user_id}
+          method: put
+  delete:
+    handler: exports/deleteUserFunction.handle
+    environment:
+      COGNITO_USER_POOL_ID:
+        Ref: UserPool
+    events:
+      - http:
+          path: users/{userId}
+          method: delete
   listUsers:
     handler: handler.listUsers
     environment:
@@ -156,12 +143,3 @@ functions:
       - http:
           path: users/{user_id}
           method: get
-  updateUser:
-    handler: handler.edit
-    environment:
-      COGNITO_USER_POOL_ID:
-        Ref: UserPool
-    events:
-      - http:
-          path: users/edit
-          method: put

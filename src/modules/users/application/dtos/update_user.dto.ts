@@ -7,7 +7,7 @@ type IUpdateUser = {
 };
 
 export class UpdateUserDTO {
-  public readonly username?: string;
+  public readonly username: string;
   public readonly password?: string;
   public readonly email?: string;
   public readonly role?: string;

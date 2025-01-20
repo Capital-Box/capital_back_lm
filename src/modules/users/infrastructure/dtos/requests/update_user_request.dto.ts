@@ -12,6 +12,10 @@ interface IUpdateUserAttributes {
 
 export class UpdateUserRequestDTO extends ApiGatewayRequestDTO<IUpdateUserAttributes> {
   validatePayload(): void {
+    const { username } = this.getPayload().attributes;
+    if(!username) {
+      throw new Error("Username is required");
+    }
   }
 
   getPayload(): ICreatePayload<IUpdateUserAttributes> {
