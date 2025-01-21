@@ -1,4 +1,4 @@
-service: orders
+service: capital-box-orders
 frameworkVersion: 4.4.x
 
 provider:
@@ -14,14 +14,26 @@ provider:
   logRetentionInDays: 7
 
   # IAM role
+  iam:
+    deploymentRole: ${param:DEPLOY_CF_ROLE}
 
-# Environment Variables
-environment:
+  # Root API
+  httpApi:
+    id: ${param:ROOT_APIGATEWAY}
+
+  # Environment Variables
+  #environment:
 
 # Resources
-resources:
-  Resources:
-  Output:
+#resources:
+#  Resources:
+#  Outputs:
 
 # Functions
 functions:
+  create-order:
+    handler: ./exports/create_order_function.handler
+    events:
+      - httpApi:
+          method: POST
+          path: /orders
