@@ -1,0 +1,40 @@
+service: capital-box-apigateway
+frameworkVersion: 4.4.x
+
+provider:
+  name: aws
+  region: ${param:AWS_REGION}
+
+  # Logs Configs
+  logRetentionInDays: 7
+
+  # IAM Roles
+  iam:
+    deploymentRole: ${param:DEPLOY_CF_ROLE}
+
+# Custom Vars
+custom:
+  ApiGatewayName: "${self:service}-${sls:stage}"
+  ApiGatewayExportIdName: "${self:custom.ApiGatewayName}-id"
+
+# Resources
+resources:
+  Resources:
+    ## ApiGateway
+    ApiGateway:
+      Type: AWS::ApiGatewayV2::Api
+      Properties:
+        Name: ${self:custom.ApiGatewayName}
+        ProtocolType: HTTP
+
+    ApiGatewayStage:
+      Type: AWS::ApiGatewayV2::Stage
+      Properties:
+        ApiId:
+          Ref: ApiGateway
+        StageName: ${sls:stage}
+        AutoDeploy: true
+
+  Outputs:
+    ApiId:
+      Value: !GetAtt ApiGateway.ApiId

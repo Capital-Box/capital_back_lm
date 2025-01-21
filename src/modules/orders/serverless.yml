@@ -1,0 +1,39 @@
+service: capital-box-orders
+frameworkVersion: 4.4.x
+
+provider:
+  name: aws
+  runtime: nodejs22.x
+  region: us-east-2
+
+  # Lambda Configs
+  memorySize: 512
+  architecture: arm64
+
+  # Logs Configs
+  logRetentionInDays: 7
+
+  # IAM role
+  iam:
+    deploymentRole: ${param:DEPLOY_CF_ROLE}
+
+  # Root API
+  httpApi:
+    id: ${param:ROOT_APIGATEWAY}
+
+  # Environment Variables
+  #environment:
+
+# Resources
+#resources:
+#  Resources:
+#  Outputs:
+
+# Functions
+functions:
+  create-order:
+    handler: ./exports/create_order_function.handler
+    events:
+      - httpApi:
+          method: POST
+          path: /orders

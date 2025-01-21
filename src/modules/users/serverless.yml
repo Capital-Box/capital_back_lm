@@ -1,0 +1,167 @@
+service: users
+frameworkVersion: 4.4.x
+
+provider:
+  name: aws
+  runtime: nodejs22.x
+  region: us-east-2
+
+  # Lambda Configs
+  memorySize: 512
+  architecture: arm64
+
+  # Logs Configs
+  logRetentionInDays: 7
+
+  # IAM role
+  iam:
+    role:
+      statements:
+        - Effect: Allow
+          Action:
+            - cognito-idp:AdminCreateUser
+            - cognito-idp:AdminSetUserPassword
+            - cognito-idp:AdminAddUserToGroup
+            - cognito-idp:AdminInitiateAuth
+            - cognito-idp:AdminUpdateUserAttributes
+            - cognito-idp:ListUsers
+            - cognito-idp:AdminGetUser
+
+          Resource:
+            - !Sub arn:aws:cognito-idp:${AWS::Region}:${AWS::AccountId}:userpool/${UserPool}
+
+environment:
+  COGNITO_CLIENT_ID:
+    Ref: UserPoolClient
+  COGNITO_USER_POOL_ID:
+    Ref: UserPool
+
+resources:
+  Resources:
+    UserPool:
+      Type: AWS::Cognito::UserPool
+      Properties:
+        UserPoolName: ${self:service}-user-pool
+        UsernameAttributes:
+          - email
+        AutoVerifiedAttributes:
+          - email
+        Policies:
+          PasswordPolicy:
+            MinimumLength: 6
+            RequireLowercase: false
+            RequireNumbers: false
+            RequireSymbols: false
+            RequireUppercase: false
+        Schema:
+          - Name: email
+            Required: true
+            AttributeDataType: String
+            Mutable: true
+          - Name: name
+            Required: true
+            AttributeDataType: String
+            Mutable: true
+          - Name: city
+            AttributeDataType: String
+            Mutable: true
+          - Name: isDeleted
+            AttributeDataType: Boolean
+            Mutable: true
+          - Name: role
+            AttributeDataType: String
+            Mutable: true
+
+    UserGroupAdmin:
+      Type: AWS::Cognito::UserPoolGroup
+      Properties:
+        GroupName: ${self:service}-admin-group
+        UserPoolId: !Ref UserPool
+
+    UserGroupDriver:
+      Type: AWS::Cognito::UserPoolGroup
+      Properties:
+        GroupName: ${self:service}-driver-group
+        UserPoolId: !Ref UserPool
+
+    UserPoolClient:
+      Type: AWS::Cognito::UserPoolClient
+      Properties:
+        ClientName: ${self:service}-user-pool-client
+        UserPoolId: !Ref UserPool
+        GenerateSecret: false
+        ExplicitAuthFlows:
+          - ALLOW_ADMIN_USER_PASSWORD_AUTH
+          - ALLOW_USER_PASSWORD_AUTH
+          - ALLOW_REFRESH_TOKEN_AUTH
+
+functions:
+  login:
+    handler: handler.login
+    environment:
+      COGNITO_CLIENT_ID:
+        Ref: UserPoolClient
+      COGNITO_USER_POOL_ID:
+        Ref: UserPool
+    events:
+      - http:
+          path: login
+          method: post
+  register:
+    handler: exports/createUserFunction.handle
+    environment:
+      COGNITO_CLIENT_ID:
+        Ref: UserPoolClient
+      COGNITO_USER_POOL_ID:
+        Ref: UserPool
+    events:
+      - http:
+          path: users/register
+          method: post
+  refreshToken:
+    handler: handler.refreshToken
+    environment:
+      COGNITO_CLIENT_ID:
+        Ref: UserPoolClient
+      COGNITO_USER_POOL_ID:
+        Ref: UserPool
+    events:
+      - http:
+          path: users/refresh-token
+          method: post
+  deleteUser:
+    handler: handler.edit
+    environment:
+      COGNITO_USER_POOL_ID:
+        Ref: UserPool
+    events:
+      - http:
+          path: users/edit
+          method: post
+  listUsers:
+    handler: handler.listUsers
+    environment:
+      COGNITO_USER_POOL_ID:
+        Ref: UserPool
+    events:
+      - http:
+          path: users/listUsers
+          method: get
+  getUserById:
+    handler: handler.getUserById
+    environment:
+      COGNITO_USER_POOL_ID:
+        Ref: UserPool
+    events:
+      - http:
+          path: users/{user_id}
+          method: get
+  updateUser:
+    handler: handler.edit
+    environment:
+      COGNITO_USER_POOL_ID:
+        Ref: UserPool
+    events:
+      - http:
+          path: users/edit
+          method: put

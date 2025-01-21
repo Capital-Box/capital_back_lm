@@ -1,4 +1,4 @@
-import { Event } from "../../domain/classes/event";
+import { Event } from "@lib/domain/event";
 import { ISubscriber } from "./subscriber.interface";
 
 export interface IPublisher {
