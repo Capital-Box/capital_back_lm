@@ -1,3 +1,14 @@
 services:
-  users: 
-    path: src/modules/users
+  shared-apigateway:
+    path: src/shared-infrastructure/apigateway
+    params:
+      DEPLOY_CF_ROLE: ${env:DEPLOY_CF_ROLE}
+      AWS_REGION: ${env:AWS_REGION}
+  #users:
+  #  path: src/modules/users
+  orders:
+    path: src/modules/orders
+    params:
+      DEPLOY_CF_ROLE: ${env:DEPLOY_CF_ROLE}
+      AWS_REGION: ${env:AWS_REGION}
+      ROOT_APIGATEWAY: ${shared-apigateway.ApiId}

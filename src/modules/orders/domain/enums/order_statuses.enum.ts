@@ -1,0 +1,7 @@
+export enum OrderMainStatuses {
+  CREATED = "CREATED",
+  IN_TRANSIT = "IN_TRANSIT",
+  DELIVERED = "DELIVERED",
+  NOT_DELIVERED = "NOT_DELIVERED",
+  CANCELLED = "CANCELLED",
+}
