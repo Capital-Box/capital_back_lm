@@ -1,4 +1,4 @@
-import { APIGatewayProxyEvent } from "aws-lambda";
+import { APIGatewayProxyEventV2 } from "aws-lambda";
 import { IRequestContext, IRequestPayload, RequestDTO } from "./request.dto";
 
 type IRequestHeaders = {
@@ -24,7 +24,7 @@ export abstract class ApiGatewayRequestDTO<
   private queryParameters: IRequestQueryParameters;
   private pathParameters: IRequestPathParameters;
 
-  constructor(event: APIGatewayProxyEvent) {
+  constructor(event: APIGatewayProxyEventV2) {
     const payload: IRequestPayload<TAttributes> = event.body
       ? JSON.parse(event.body)
       : null;
@@ -32,7 +32,7 @@ export abstract class ApiGatewayRequestDTO<
       requestId: event.requestContext.requestId,
       identity: {
         source: event.requestContext.apiId,
-        sub: event.requestContext.identity.user || undefined,
+        sub: '',
       },
     };
     super({
