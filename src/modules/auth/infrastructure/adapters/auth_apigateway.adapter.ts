@@ -6,12 +6,13 @@ import { RefreshTokenRequestDTO } from "../dtos/request/refresh_token_request.dt
 import { LoginResponseDTO } from "../dtos/response/login_response.dto";
 import { RefreshTokenResponseDTO } from "../dtos/response/refresh_token.response.dto";
 import { LoginUserPort } from "../ports/login_user.port";
+import { RefreshTokenPort } from "../ports/refresh_token.port";
 
 interface AuthApiGatewayAdapterDependencies {
   service: LoginUserCase & RefreshTokenCase
 }
 
-export class AuthApiGatewayAdapter implements LoginUserPort {
+export class AuthApiGatewayAdapter implements LoginUserPort, RefreshTokenPort {
   constructor(
     private readonly dependencies: AuthApiGatewayAdapterDependencies
   ) {}

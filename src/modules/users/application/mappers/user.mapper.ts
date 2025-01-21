@@ -10,11 +10,11 @@ import { Cities } from "modules/users/domain/enums/cities.enum";
 export class UserMapper {
   static toEntity(user: UserDTO): User {
     return new User({
-      name: user.name,
-      password: new Password(user.password),
-      email: new Email(user.email),
-      role: new Role(user.role as Roles),
-      city: new City(user.city as Cities),
+      name: user.getUsername(),
+      password: new Password(user.getPassword()),
+      email: new Email(user.getEmail()),
+      role: new Role(user.getRole() as Roles),
+      city: new City(user.getCity() as Cities),
     });
   }
 

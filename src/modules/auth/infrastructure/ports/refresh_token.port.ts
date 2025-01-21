@@ -3,5 +3,5 @@ import { RefreshTokenRequestDTO } from "../dtos/request/refresh_token_request.dt
 import { RefreshTokenResponseDTO } from '../dtos/response/refresh_token.response.dto';
 
 export interface RefreshTokenPort {
-    refreshToken(): Handler<RefreshTokenRequestDTO, RefreshTokenResponseDTO>;
+    refreshToken: Handler<RefreshTokenRequestDTO, RefreshTokenResponseDTO>;
     }

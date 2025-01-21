@@ -3,13 +3,8 @@ import { UserService } from "../application/services/user.service";
 import { UserApiGatewayAdapter } from "../infrastructure/adapters/user_apigateway.adapter";
 import { RegisterUserRequestDTO } from "../infrastructure/dtos/requests/register_user_request.dto";
 
-// Cual es la dependencia que deberia meter?
-const userService = new UserService();
 
-const userApiGatewayAdapter = new UserApiGatewayAdapter({
-  service: userService,
-});
-
+// Modificar esta
 export const handle = async (req: APIGatewayProxyEvent) => {
   const requestDTO = new RegisterUserRequestDTO(req);
   const responseDTO = await userApiGatewayAdapter.createUser(requestDTO);

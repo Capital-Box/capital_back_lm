@@ -17,7 +17,6 @@ export class LoginUserResponseDTO extends ApiGatewayResponseDTO<ILoginAttributes
         attributes: {
           access_token: tokens.access_token,
           refresh_token: tokens.refresh_token,
-          id: tokens.id,
         },
       },
     });

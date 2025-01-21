@@ -76,4 +76,11 @@ export class CognitoAuthRepository implements AuthRepositoryPort {
       throw new Error("Refresh token invalid");
     }
   }
+
+  // async logout(refreshToken: string): Promise<void> {
+  //   try {
+  //     const command = new AdminInitiateAuthCommand({
+  //       UserPoolId: this.userPoolId,
+  //       ClientId: this.clientId,
+  //       AuthFlow: 
 }

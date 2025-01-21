@@ -12,7 +12,7 @@ type IRelationships = {
 export type IPayload<TAttributes> = {
   id: string;
   type: string;
-  attributes: TAttributes;
+  attributes: Omit <TAttributes, "id">;
   relationships?: IRelationships;
   links?: {
     self: string;
@@ -21,12 +21,12 @@ export type IPayload<TAttributes> = {
 
 export type IResponse<TAttributes> = {
   status: HttpStatus;
-  payload: IPayload<TAttributes>;
+  payload: IPayload<TAttributes> | IPayload<TAttributes>[];
 };
 
 export abstract class ResponseDTO<TAttributes = any> {
   private status: HttpStatus;
-  private payload: IPayload<TAttributes>;
+  private payload: IPayload<TAttributes> | IPayload<TAttributes>[];
 
   constructor(res: IResponse<TAttributes>) {
     this.status = res.status;
@@ -41,11 +41,11 @@ export abstract class ResponseDTO<TAttributes = any> {
     this.status = status;
   }
 
-  getPayload(): IPayload<TAttributes> {
+  getPayload(): IPayload<TAttributes> | IPayload<TAttributes>[] {
     return this.payload;
   }
 
-  setPayload(payload: IPayload<TAttributes>): void {
+  setPayload(payload: IPayload<TAttributes> | IPayload<TAttributes>[]): void {
     this.payload = payload;
   }
 

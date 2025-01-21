@@ -15,6 +15,8 @@ import {
   ResponseDTO,
 } from "@lib/infrastructure/dtos/responses/response.dto";
 import { ListUsersCase } from "modules/users/application/use_cases/list_users.case";
+import { DeleteUserResponseDTO } from "../dtos/responses/delete_user_response.dto";
+import { UserListResponseDTO } from "../dtos/responses/user_list_response.dto";
 
 interface UserApiGatewayAdapterDependencies {
   service: CreateUserCase & UpdateUserCase & DeleteUserCase & ListUsersCase;
@@ -35,66 +37,49 @@ export class UserApiGatewayAdapter implements CreateUserPort, UpdateUserPort {
     const response = new UserResponseDTO({
       status: HttpStatus.CREATED,
       payload: {
-        id: userDTO.email,
+        id: userDTO.getEmail(),
         type: "user",
-        attributes: userDTO,
+        attributes: {
+          email: userDTO.getEmail(),
+          name: userDTO.getName(),
+          role: userDTO.getRole(),
+          city: userDTO.getCity(),
+        },
       },
     });
     return response;
   }
 
-  //Chequear que este ok
   async updateUser(req: UpdateUserRequestDTO): Promise<UserResponseDTO> {
     req.validatePayload();
     req.validateParameters();
-
-    // Faltaria verificar que el usuario existe
-
     const reqPayload = req.getPayload().attributes;
     const updateUserDTO = new UpdateUserDTO(reqPayload);
     const userDTO = await this.dependencies.service.update(updateUserDTO);
     const response = new UserResponseDTO({
       status: HttpStatus.OK,
       payload: {
-        id: userDTO.email,
+        id: userDTO.getEmail(),
         type: "update",
-        attributes: userDTO,
+        attributes: userDTO.toObject(),
       },
     });
     return response;
   }
 
-  // Chequear que este ok
-  async deleteUser(req: DeleteUserRequestDTO): Promise<IResponse<Object>> {
-    req.validateParameters();
-    const userId = req.getUserId();
-    await this.dependencies.service.delete(userId);
-    const response = {
-      status: HttpStatus.NO_CONTENT,
-      payload: {
-        id: userId,
-        type: "delete",
-        attributes: {
-          message: "User deleted successfully",
-        },
-      },
-    };
-    return response;
+  async deleteUser(req: DeleteUserRequestDTO): Promise<DeleteUserResponseDTO> {
+    try {
+      req.validateParameters();
+      const userId = req.getUserId();
+      await this.dependencies.service.delete(userId);
+      return new DeleteUserResponseDTO(userId);
+    } catch (error: any) {
+      return new DeleteUserResponseDTO("Error deleting User");
+    }
   }
 
-  // Chequear que este ok - Importante aca manejar el tema de los filtrados en cognito
-  async listUsers(): Promise<UserResponseDTO[]> {
+  async listUsers(): Promise<UserListResponseDTO> {
     const userDTOs = await this.dependencies.service.list();
-
-    // Podrías crear un "UserListResponseDTO" si deseas
-    // retornar un array de usuarios en el atributo principal.
-    return new UserResponseDTO({
-      status: HttpStatus.OK,
-      payload: {
-        id: "", // o algún ID simbólico
-        type: "users_list",
-        attributes: userDTOs,
-      },
-    });
+    return new UserListResponseDTO(userDTOs);
   }
 }
