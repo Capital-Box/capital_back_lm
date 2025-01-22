@@ -13,135 +13,81 @@ provider:
   # Logs Configs
   logRetentionInDays: 7
 
-  # IAM role
+  # IAM role con permisos para DynamoDB
   iam:
     role:
       statements:
         - Effect: Allow
           Action:
-            - cognito-idp:AdminCreateUser
-            - cognito-idp:AdminSetUserPassword
-            - cognito-idp:AdminAddUserToGroup
-            - cognito-idp:AdminInitiateAuth
-            - cognito-idp:AdminUpdateUserAttributes
-            - cognito-idp:ListUsers
-            - cognito-idp:AdminGetUser
+            - dynamodb:PutItem
+            - dynamodb:GetItem
+            - dynamodb:UpdateItem
+            - dynamodb:DeleteItem
+            - dynamodb:Scan
+          Resource: 
+            - !GetAtt UsersTable.Arn
 
-          Resource:
-            - !Sub arn:aws:cognito-idp:${AWS::Region}:${AWS::AccountId}:userpool/${UserPool}
-
+# Variables de entorno para la tabla
 environment:
-  COGNITO_CLIENT_ID:
-    Ref: UserPoolClient
-  COGNITO_USER_POOL_ID:
-    Ref: UserPool
-
-resources:
-  Resources:
-    UserPool:
-      Type: AWS::Cognito::UserPool
-      Properties:
-        UserPoolName: ${self:service}-user-pool
-        UsernameAttributes:
-          - email
-        AutoVerifiedAttributes:
-          - email
-        Policies:
-          PasswordPolicy:
-            MinimumLength: 6
-            RequireLowercase: false
-            RequireNumbers: false
-            RequireSymbols: false
-            RequireUppercase: false
-        Schema:
-          - Name: email
-            Required: true
-            AttributeDataType: String
-            Mutable: true
-          - Name: name
-            Required: true
-            AttributeDataType: String
-            Mutable: true
-          - Name: city
-            AttributeDataType: String
-            Mutable: true
-          - Name: isDeleted
-            AttributeDataType: Boolean
-            Mutable: true
-          - Name: role
-            AttributeDataType: String
-            Mutable: true
-
-    UserGroupAdmin:
-      Type: AWS::Cognito::UserPoolGroup
-      Properties:
-        GroupName: ${self:service}-admin-group
-        UserPoolId: !Ref UserPool
-
-    UserGroupDriver:
-      Type: AWS::Cognito::UserPoolGroup
-      Properties:
-        GroupName: ${self:service}-driver-group
-        UserPoolId: !Ref UserPool
-
-    UserPoolClient:
-      Type: AWS::Cognito::UserPoolClient
-      Properties:
-        ClientName: ${self:service}-user-pool-client
-        UserPoolId: !Ref UserPool
-        GenerateSecret: false
-        ExplicitAuthFlows:
-          - ALLOW_ADMIN_USER_PASSWORD_AUTH
-          - ALLOW_USER_PASSWORD_AUTH
-          - ALLOW_REFRESH_TOKEN_AUTH
+  USERS_TABLE_NAME: !Ref UsersTable
 
 functions:
   create:
     handler: exports/createUserFunction.handle
     environment:
-      COGNITO_CLIENT_ID:
-        Ref: UserPoolClient
-      COGNITO_USER_POOL_ID:
-        Ref: UserPool
+      USERS_TABLE_NAME: !Ref UsersTable
     events:
       - http:
           path: users/register
           method: post
+
   update:
     handler: exports/updateUserFunction.handle
     environment:
-      COGNITO_USER_POOL_ID:
-        Ref: UserPool
+      USERS_TABLE_NAME: !Ref UsersTable
     events:
       - http:
           path: users/{user_id}
           method: put
+
   delete:
     handler: exports/deleteUserFunction.handle
     environment:
-      COGNITO_USER_POOL_ID:
-        Ref: UserPool
+      USERS_TABLE_NAME: !Ref UsersTable
     events:
       - http:
           path: users/{userId}
           method: delete
+
   listUsers:
     handler: exports/listUsersFunction.handle
     environment:
-      COGNITO_USER_POOL_ID:
-        Ref: UserPool
-      COGNITO_CLIENT_ID:
-        Ref: UserPoolClient
+      USERS_TABLE_NAME: !Ref UsersTable
     events:
       - http:
           path: users/listUsers
           method: get
+
   getUserById:
     handler: handler.getUserById
     environment:
-      COGNITO_USER_POOL_ID:
-        Ref: UserPool
+      USERS_TABLE_NAME: !Ref UsersTable
     events:
       - http:
           path: users/{user_id}
           method: get
+
+
+resources:
+  Resources:
+    UsersTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: UsersTable
+        BillingMode: PAY_PER_REQUEST
+        AttributeDefinitions:
+          - AttributeName: PK
+            AttributeType: S
+        KeySchema:
+          - AttributeName: PK
+            KeyType: HASH
