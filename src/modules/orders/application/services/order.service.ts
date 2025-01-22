@@ -17,7 +17,7 @@ interface OrderServiceDependencies {
   publisher?: IPublisher;
 }
 export class OrderService implements CreateOrderCase {
-  constructor(private _dependencies: OrderServiceDependencies) { }
+  constructor(private _dependencies: OrderServiceDependencies) {}
 
   private async saveReceiver(receiverDTO: ReceiverDTO): Promise<Receiver> {
     const receiver = ReceiverFactory.create(receiverDTO);
@@ -27,7 +27,7 @@ export class OrderService implements CreateOrderCase {
 
   async save(createOrderDTO: CreateOrderDTO): Promise<OrderDTO> {
     const order = OrderFactory.create(createOrderDTO);
-    await this.saveReceiver(createOrderDTO.getReceiver());
+    await this.saveReceiver(createOrderDTO.receiver);
     await this._dependencies.orderRepository.save(order);
     await this.publishEvents(order);
     return OrderMapper.toDTO(order);

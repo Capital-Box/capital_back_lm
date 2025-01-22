@@ -1,4 +1,5 @@
 import { ApiGatewayResponseDTO } from "@lib/infrastructure/dtos/responses/apigateway_response.dto";
+import { IPayload } from "@lib/infrastructure/dtos/responses/response.dto";
 import { HttpStatus } from "@lib/infrastructure/enums/http_status.enum";
 import { OrderDTO } from "modules/orders/application/dtos/order.dto";
 
@@ -12,30 +13,31 @@ interface IOrderAttributes {
 }
 
 export class OrderResponseDTO extends ApiGatewayResponseDTO<IOrderAttributes> {
-  constructor(httpStatus: HttpStatus, order: OrderDTO) {
-    super({
-      status: httpStatus,
-      payload: {
-        type: 'order',
-        id: order.getId(),
-        attributes: {
-          external_provider: order.getExternalProvider(),
-          external_id: order.getExternalId(),
-          main_status: order.getMainStatus(),
-          sub_status: order.getSubStatus(),
-          created_date: order.getCreatedDate(),
-          last_updated: order.getLastUpdated(),
-        },
-        relationships: {
-          receiver: {
-            data: {
-              id: order.getReceiverId(),
-              type: 'receiver'
-            }
-          }
-        }
-      }
-    });
+  constructor() {
+    super();
   }
 
+  setPayload(orderDTO: OrderDTO): this {
+    super.setPayload({
+      type: "order",
+      id: orderDTO.getId(),
+      attributes: {
+        external_provider: orderDTO.getExternalProvider(),
+        external_id: orderDTO.getExternalId(),
+        main_status: orderDTO.getMainStatus(),
+        sub_status: orderDTO.getSubStatus(),
+        created_date: orderDTO.getCreatedDate(),
+        last_updated: orderDTO.getLastUpdated(),
+      },
+      relationships: {
+        receiver: {
+          data: {
+            id: orderDTO.getReceiverId(),
+            type: "receiver",
+          },
+        },
+      },
+    });
+    return this;
+  }
 }

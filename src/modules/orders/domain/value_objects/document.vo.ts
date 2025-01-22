@@ -1,19 +1,24 @@
 import { DocumentTypes } from "../enums/document_types.enum";
 
-export class Document {
-  private document_type: DocumentTypes;
-  private document_number: string;
+interface DocumentConstructor {
+  documentType: DocumentTypes;
+  documentNumber: string;
+}
 
-  constructor(document_type: DocumentTypes, document_number: string) {
-    this.document_type = document_type;
-    this.document_number = document_number;
+export class Document {
+  private documentType: DocumentTypes;
+  private documentNumber: string;
+
+  constructor(document: DocumentConstructor) {
+    this.documentType = document.documentType;
+    this.documentNumber = document.documentNumber;
   }
 
   getDocumentType(): DocumentTypes {
-    return this.document_type;
+    return this.documentType;
   }
 
   getDocumentNumber(): string {
-    return this.document_number;
+    return this.documentNumber;
   }
 }

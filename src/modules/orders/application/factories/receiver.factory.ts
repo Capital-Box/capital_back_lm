@@ -8,15 +8,11 @@ import { UUID } from "@shared/value_objects/uuid.vo";
 export class ReceiverFactory {
   static create(receiver: ReceiverDTO): Receiver {
     return new Receiver({
-      firstName: receiver.getFirstName(),
-      lastName: receiver.getLastName(),
-      document: new Document(receiver.getDocument().getDocumentType(), receiver.getDocument().getDocumentNumber()),
-      email: new Email(receiver.getEmail().getEmail()),
-      phone: new Phone({
-        areaCode: receiver.getPhone().getAreaCode(),
-        number: receiver.getPhone().getNumber(),
-        phoneType: receiver.getPhone().getPhoneType(),
-      }),
+      firstName: receiver.firstName,
+      lastName: receiver.lastName,
+      document: new Document(receiver.document),
+      email: new Email(receiver.email.email),
+      phone: new Phone(receiver.phone),
     });
   }
 }

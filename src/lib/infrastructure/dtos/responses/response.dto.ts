@@ -1,3 +1,4 @@
+import { Exception, IException } from "@lib/shared/exceptions/exception";
 import { HttpStatus } from "../../enums/http_status.enum";
 
 type IRelationships = {
@@ -20,39 +21,53 @@ export type IPayload<TAttributes> = {
 };
 
 export type IResponse<TAttributes> = {
-  status: HttpStatus;
-  payload: IPayload<TAttributes>;
+  data?: IPayload<TAttributes> | undefined;
+  errors?: IException[] | undefined;
 };
 
 export abstract class ResponseDTO<TAttributes = any> {
   private status: HttpStatus;
-  private payload: IPayload<TAttributes>;
+  private data: IPayload<TAttributes> | undefined;
+  private errors: IException[] | undefined;
 
-  constructor(res: IResponse<TAttributes>) {
-    this.status = res.status;
-    this.payload = res.payload;
+  constructor() {
+    this.status = HttpStatus.OK;
   }
 
   getStatus(): HttpStatus {
     return this.status;
   }
 
-  setStatus(status: HttpStatus): void {
+  setStatus(status: HttpStatus): this {
     this.status = status;
+    return this;
   }
 
-  getPayload(): IPayload<TAttributes> {
-    return this.payload;
+  getPayload(): IPayload<TAttributes> | undefined {
+    return this.data;
   }
 
-  setPayload(payload: IPayload<TAttributes>): void {
-    this.payload = payload;
+  setPayload(payload: IPayload<TAttributes> | any): this {
+    this.data = payload;
+    return this;
+  }
+
+  getErrors(): IException[] | undefined {
+    return this.errors;
+  }
+
+  setErrors(exceptions: Exception[]): this {
+    this.errors = exceptions.map((exception) => exception.toPlain());
+    return this;
   }
 
   send(): IResponse<TAttributes> | any {
-    return {
-      status: this.getStatus(),
-      payload: this.getPayload(),
-    };
+    const response: IResponse<TAttributes> = {};
+
+    if (this.getPayload()) response.data = this.getPayload();
+
+    if (this.getErrors()) response.errors = this.getErrors();
+
+    return response;
   }
 }

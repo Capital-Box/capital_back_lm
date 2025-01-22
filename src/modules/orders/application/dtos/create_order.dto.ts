@@ -1,5 +1,6 @@
 import { ExternalProviders } from "modules/orders/domain/enums/external_providers.enum";
 import { ReceiverDTO } from "./reiceiver.dto";
+import { IsEnum, IsOptional, IsString, ValidateNested } from "class-validator";
 
 interface CreateOrderConstructor {
   receiver: ReceiverDTO;
@@ -7,27 +8,21 @@ interface CreateOrderConstructor {
   externalId: string | null;
 }
 
-
 export class CreateOrderDTO {
-  private externalProvider: ExternalProviders | null;
-  private externalId: string | null;
-  private receiver: ReceiverDTO;
+  @IsOptional()
+  @IsEnum(ExternalProviders)
+  public externalProvider: ExternalProviders | null;
+
+  @IsOptional()
+  @IsString()
+  public externalId: string | null;
+
+  @ValidateNested()
+  public receiver: ReceiverDTO;
 
   constructor(createOrder: CreateOrderConstructor) {
     this.externalProvider = createOrder.externalProvider;
     this.externalId = createOrder.externalId;
     this.receiver = createOrder.receiver;
-  }
-
-  getExternalProvider(): ExternalProviders | null {
-    return this.externalProvider;
-  }
-
-  getExternalId(): string | null {
-    return this.externalId
-  }
-
-  getReceiver(): ReceiverDTO {
-    return this.receiver;
   }
 }

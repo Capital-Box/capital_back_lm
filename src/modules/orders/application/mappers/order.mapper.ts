@@ -1,6 +1,5 @@
 import { Order } from "modules/orders/domain/entities/order.entity";
 import { OrderDTO } from "../dtos/order.dto";
-import { ReceiverMapper } from "./receiver.mapper";
 
 export class OrderMapper {
   static toDTO(order: Order): OrderDTO {
@@ -12,7 +11,7 @@ export class OrderMapper {
       mainStatus: order.getMainStatus(),
       subStatus: order.getSubStatus(),
       createdDate: order.getCreatedDate(),
-      lastUpdated: order.getLastUpdated()
+      lastUpdated: order.getLastUpdated(),
     });
   }
 }

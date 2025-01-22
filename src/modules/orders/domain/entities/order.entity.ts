@@ -6,7 +6,6 @@ import { Entity } from "@lib/domain/entity";
 import { OrderChangeStatusEvent } from "../events/order_change_status.event";
 import { ExternalProvider } from "../value_objects/external_provider.vo";
 import { ExternalProviders } from "../enums/external_providers.enum";
-import { Receiver } from "./receiver.entity";
 
 interface OrderConstructor {
   id: UUID;
@@ -59,9 +58,14 @@ export class Order extends Entity {
     return this.status.getSubStatus();
   }
 
-  changeStatus(mainStatus: OrderMainStatuses, subStatus: OrderSubStatuses): void {
+  changeStatus(
+    mainStatus: OrderMainStatuses,
+    subStatus: OrderSubStatuses
+  ): void {
     this.status.changeStatus(mainStatus, subStatus);
-    this.addEvent(new OrderChangeStatusEvent(this.id.getUUID(), mainStatus, subStatus));
+    this.addEvent(
+      new OrderChangeStatusEvent(this.id.getUUID(), mainStatus, subStatus)
+    );
   }
 
   getCreatedDate(): Date {
