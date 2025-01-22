@@ -10,6 +10,7 @@ import { ReceiverDTO } from "modules/orders/application/dtos/reiceiver.dto";
 import { DocumentTypes } from "modules/orders/domain/enums/document_types.enum";
 import { validateSync, ValidationError } from "class-validator";
 import { ValidationException } from "@lib/shared/exceptions/validation.exception";
+import { IValidator } from "@lib/application/interfaces/validator.interface";
 
 interface ICreateOrderAttributes {
   receiver: {
@@ -33,49 +34,17 @@ export class CreateOrderRequestDTO extends ApiGatewayRequestDTO<ICreateOrderAttr
     super(event);
   }
 
-  validatePayload(): void {
+  validatePayload(validationService: IValidator): void {
     const createOrderDTO = this.getCreateOrder();
-    const errors = validateSync(createOrderDTO, {
-      whitelist: true,
-    });
-    if (errors.length > 0) throw this.formatValidationErrors(errors);
+    validationService.validate(createOrderDTO, "pointer", "attributes");
   }
 
-  private formatValidationErrors(
-    errors: ValidationError[]
-  ): ValidationException[] {
-    const exceptions: ValidationException[] = [];
-
-    const processErrors = (errors: ValidationError[], parentPath = "") => {
-      for (const error of errors) {
-        const field = error.property;
-        const path = parentPath
-          ? `${parentPath}/${field}`
-          : `/data/attributes/${field}`;
-
-        const constraints = Object.values(error.constraints || {});
-        constraints.forEach((constraint) =>
-          exceptions.push(
-            new ValidationException(constraint, { pointer: path })
-          )
-        );
-
-        if (error.children && error.children.length > 0) {
-          processErrors(error.children, path);
-        }
-      }
-    };
-
-    processErrors(errors);
-    return exceptions;
-  }
-
-  getPayload(): ICreatePayload<ICreateOrderAttributes> {
-    return super.getPayload() as ICreatePayload<ICreateOrderAttributes>;
+  getData(): ICreatePayload<ICreateOrderAttributes> {
+    return super.getData() as ICreatePayload<ICreateOrderAttributes>;
   }
 
   getCreateOrder(): CreateOrderDTO {
-    const orderAttributes = this.getPayload().attributes;
+    const orderAttributes = this.getData().attributes;
     const receiver = new ReceiverDTO({
       firstName: orderAttributes.receiver.first_name,
       lastName: orderAttributes.receiver.last_name,

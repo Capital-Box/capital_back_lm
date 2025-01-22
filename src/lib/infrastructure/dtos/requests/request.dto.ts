@@ -1,3 +1,6 @@
+import { IValidator } from "@lib/application/interfaces/validator.interface";
+import { ValidationException } from "@lib/shared/exceptions/validation.exception";
+
 type IRelationships = {
   [key: string]: {
     data: {
@@ -31,13 +34,17 @@ type IFindPayload<TAttributes> = {
   attributes?: Partial<TAttributes>;
 };
 
-export type IRequestPayload<TAttributes> =
+export type IRequestData<TAttributes> =
   | ICreatePayload<TAttributes>
   | Array<ICreatePayload<TAttributes>>
   | IUpdatePayload<TAttributes>
   | IDeletePayload
   | IFindPayload<TAttributes>
   | null;
+
+export type IRequestPayload<TAttributes> = {
+  data?: IRequestData<TAttributes>;
+};
 
 export type IRequestContext = {
   requestId: string;
@@ -65,11 +72,19 @@ export abstract class RequestDTO<TAttributes = any> {
     return this.payload;
   }
 
+  getData(): IRequestData<TAttributes> {
+    if (!this.payload.data)
+      throw new ValidationException("Data property is required", {
+        pointer: "/data",
+      });
+    return this.payload.data;
+  }
+
   getContext(): IRequestContext {
     return this.context;
   }
 
-  abstract validatePayload(): void;
+  abstract validatePayload(validationService: IValidator): void;
 }
 
 /*
