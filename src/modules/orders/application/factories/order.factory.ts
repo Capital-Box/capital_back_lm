@@ -6,6 +6,7 @@ import { OrderMainStatuses } from 'modules/orders/domain/enums/order_statuses.en
 import { OrderSubStatuses } from 'modules/orders/domain/enums/order_sub_statuses.enum';
 import { ExternalProviderFactory } from './external_provider.factory';
 import { ReceiverFactory } from './receiver.factory';
+import { LocationFactory } from './location.factory';
 
 export class OrderFactory {
   static create(createOrderDTO: CreateOrderDTO): Order {
@@ -19,11 +20,15 @@ export class OrderFactory {
       createOrderDTO.externalId,
     );
     const receiver = ReceiverFactory.create(createOrderDTO.receiver);
+    const origin = LocationFactory.create(createOrderDTO.origin);
+    const destiny = LocationFactory.create(createOrderDTO.destiny);
     return new Order({
       id,
       externalProvider,
       receiverId: receiver.getDocument().getDocumentNumber(),
       status,
+      origin,
+      destiny,
       createdDate: new Date(),
       lastUpdated: new Date(),
     });

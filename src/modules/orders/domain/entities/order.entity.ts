@@ -6,11 +6,14 @@ import { Entity } from '@lib/domain/entity';
 import { OrderChangeStatusEvent } from '../events/order_change_status.event';
 import { ExternalProvider } from '../value_objects/external_provider.vo';
 import { ExternalProviders } from '../enums/external_providers.enum';
+import { Location } from '../value_objects/location';
 
 interface OrderConstructor {
   id: UUID;
   externalProvider: ExternalProvider | null;
   receiverId: string;
+  origin: Location;
+  destiny: Location;
   status: OrderStatus;
   createdDate: Date;
   lastUpdated: Date;
@@ -20,6 +23,8 @@ export class Order extends Entity {
   private readonly id: UUID;
   private readonly externalProvider: ExternalProvider | null;
   private readonly receiverId: string;
+  private readonly origin: Location;
+  private readonly destiny: Location;
   private readonly status: OrderStatus;
   private readonly createdDate: Date;
   private readonly lastUpdated: Date;
@@ -29,6 +34,8 @@ export class Order extends Entity {
     this.id = order.id;
     this.externalProvider = order.externalProvider;
     this.receiverId = order.receiverId;
+    this.origin = order.origin;
+    this.destiny = order.destiny;
     this.status = order.status;
     this.createdDate = order.createdDate;
     this.lastUpdated = order.lastUpdated;
@@ -48,6 +55,14 @@ export class Order extends Entity {
 
   getExternalId(): string | null {
     return this.externalProvider?.getExternalId() || null;
+  }
+
+  getOrigin(): Location {
+    return this.origin;
+  }
+
+  getDestiny(): Location {
+    return this.destiny;
   }
 
   getMainStatus(): OrderMainStatuses {

@@ -22,6 +22,8 @@ export class OrderResponseDTO extends ApiGatewayResponseDTO<IOrderAttributes> {
       attributes: {
         external_provider: orderDTO.getExternalProvider(),
         external_id: orderDTO.getExternalId(),
+        origin: orderDTO.getOrigin(),
+        destiny: orderDTO.getDestiny(),
         main_status: orderDTO.getMainStatus(),
         sub_status: orderDTO.getSubStatus(),
         created_date: orderDTO.getCreatedDate(),

@@ -9,8 +9,44 @@ import { DocumentDTO } from 'modules/orders/application/dtos/document.dto';
 import { ReceiverDTO } from 'modules/orders/application/dtos/reiceiver.dto';
 import { DocumentTypes } from 'modules/orders/domain/enums/document_types.enum';
 import { IValidator } from '@lib/application/interfaces/validator.interface';
+import { LocationTypes } from 'modules/orders/domain/enums/location_types.enum';
+import { LocationDTO } from 'modules/orders/application/dtos/location.dto';
+import { LocationAddressDTO } from 'modules/orders/application/dtos/location_address.dto';
+import { GeoLocationDTO } from 'modules/orders/application/dtos/geo_location.dto';
 
 interface ICreateOrderAttributes {
+  origin: {
+    type: LocationTypes;
+    street_name: string;
+    street_number: string;
+    address_floor: string;
+    address_apartment: string;
+    address_neighborhood: string;
+    coordinates: string;
+    latitude: string;
+    longitude: string;
+    zip_code: string;
+    city_name: string;
+    state_name: string;
+    country_name: string;
+    observation: string;
+  };
+  destiny: {
+    type: LocationTypes;
+    street_name: string;
+    street_number: string;
+    address_floor: string;
+    address_apartment: string;
+    address_neighborhood: string;
+    coordinates: string;
+    latitude: string;
+    longitude: string;
+    zip_code: string;
+    city_name: string;
+    state_name: string;
+    country_name: string;
+    observation: string;
+  };
   receiver: {
     first_name: string;
     last_name: string;
@@ -57,8 +93,42 @@ export class CreateOrderRequestDTO extends ApiGatewayRequestDTO<ICreateOrderAttr
         number: orderAttributes.receiver.phone.number,
       }),
     });
+    const origin: LocationDTO =
+      orderAttributes.origin?.type === LocationTypes.ADDRESS
+        ? new LocationAddressDTO({
+            streetName: orderAttributes.origin.street_name,
+            streetNumber: orderAttributes.origin.street_number,
+            addressFloor: orderAttributes.origin.address_floor,
+            addressApartment: orderAttributes.origin.address_apartment,
+            addressNeighborhood: orderAttributes.origin.address_neighborhood,
+            geo: new GeoLocationDTO(orderAttributes.origin),
+            zipCode: orderAttributes.origin.zip_code,
+            cityName: orderAttributes.origin.city_name,
+            stateName: orderAttributes.origin.state_name,
+            countryName: orderAttributes.origin.country_name,
+            observation: orderAttributes.origin.observation,
+          })
+        : new LocationDTO(orderAttributes.origin?.type);
+    const destiny: LocationDTO =
+      orderAttributes.destiny?.type === LocationTypes.ADDRESS
+        ? new LocationAddressDTO({
+            streetName: orderAttributes.destiny.street_name,
+            streetNumber: orderAttributes.destiny.street_number,
+            addressFloor: orderAttributes.destiny.address_floor,
+            addressApartment: orderAttributes.destiny.address_apartment,
+            addressNeighborhood: orderAttributes.destiny.address_neighborhood,
+            geo: new GeoLocationDTO(orderAttributes.destiny),
+            zipCode: orderAttributes.destiny.zip_code,
+            cityName: orderAttributes.destiny.city_name,
+            stateName: orderAttributes.destiny.state_name,
+            countryName: orderAttributes.destiny.country_name,
+            observation: orderAttributes.destiny.observation,
+          })
+        : new LocationDTO(orderAttributes.destiny?.type);
     const createOrderDTO = new CreateOrderDTO({
       receiver,
+      origin,
+      destiny,
       externalProvider: null,
       externalId: null,
     });
