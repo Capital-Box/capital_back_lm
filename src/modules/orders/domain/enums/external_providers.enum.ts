@@ -1,3 +1,3 @@
 export enum ExternalProviders {
-  NX = "NX"
+  NX = 'NX',
 }

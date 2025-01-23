@@ -1,11 +1,14 @@
-import { ReceiverRepositoryPort } from "../ports/receiver_repository.port";
-import { Receiver } from "modules/orders/domain/entities/receiver.entity";
+import { ReceiverRepositoryPort } from '../ports/receiver_repository.port';
+import { Receiver } from 'modules/orders/domain/entities/receiver.entity';
 
-import { DynamoDBClient, PutItemCommand } from "@aws-sdk/client-dynamodb";
-import { marshall } from "@aws-sdk/util-dynamodb";
+import { DynamoDBClient, PutItemCommand } from '@aws-sdk/client-dynamodb';
+import { marshall } from '@aws-sdk/util-dynamodb';
 
 export class ReceiverDynamoAdapter implements ReceiverRepositoryPort {
-  constructor(private tableName: string, private client: DynamoDBClient = new DynamoDBClient()) { }
+  constructor(
+    private tableName: string,
+    private client: DynamoDBClient = new DynamoDBClient(),
+  ) {}
 
   async save(receiver: Receiver): Promise<void> {
     const receiverMarshall = marshall({
@@ -16,13 +19,13 @@ export class ReceiverDynamoAdapter implements ReceiverRepositoryPort {
       email: receiver.getEmail().getEmail(),
       phone_number: receiver.getPhone().getNumber(),
       phone_area_code: receiver.getPhone().getAreaCode(),
-      phone_type: receiver.getPhone().getPhoneType()
-    })
+      phone_type: receiver.getPhone().getPhoneType(),
+    });
 
     const command = new PutItemCommand({
       TableName: this.tableName,
-      Item: receiverMarshall
-    })
+      Item: receiverMarshall,
+    });
 
     await this.client.send(command);
   }

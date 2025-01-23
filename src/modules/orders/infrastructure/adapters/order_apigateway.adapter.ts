@@ -1,12 +1,12 @@
-import { CreateOrderCase } from "modules/orders/application/use_cases/create_order.case";
-import { CreateOrderRequestDTO } from "../dto/requests/create_order_request.dto";
-import { OrderResponseDTO } from "../dto/responses/order_response.dto";
-import { CreateOrderPort } from "../ports/create_order.port";
-import { HttpStatus } from "@lib/infrastructure/enums/http_status.enum";
-import { UnexpectedException } from "@lib/shared/exceptions/unexpected.exception";
-import { IValidator } from "@lib/application/interfaces/validator.interface";
-import { Exception } from "@lib/shared/exceptions/exception";
-import { ValidationException } from "@lib/shared/exceptions/validation.exception";
+import { CreateOrderCase } from 'modules/orders/application/use_cases/create_order.case';
+import { CreateOrderRequestDTO } from '../dto/requests/create_order_request.dto';
+import { OrderResponseDTO } from '../dto/responses/order_response.dto';
+import { CreateOrderPort } from '../ports/create_order.port';
+import { HttpStatus } from '@lib/infrastructure/enums/http_status.enum';
+import { UnexpectedException } from '@lib/shared/exceptions/unexpected.exception';
+import { IValidator } from '@lib/application/interfaces/validator.interface';
+import { Exception } from '@lib/shared/exceptions/exception';
+import { ValidationException } from '@lib/shared/exceptions/validation.exception';
 
 interface OrderApiGatewayAdapterDependencies {
   service: CreateOrderCase;
@@ -21,7 +21,7 @@ export class OrderApiGatewayAdapter implements CreateOrderPort {
     try {
       req.validatePayload(this._dependencies.validator);
       const orderDTO = await this._dependencies.service.save(
-        req.getCreateOrder()
+        req.getCreateOrder(),
       );
       response.setStatus(HttpStatus.OK).setPayload(orderDTO);
       return response;

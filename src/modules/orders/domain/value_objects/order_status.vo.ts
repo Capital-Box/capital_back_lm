@@ -1,6 +1,6 @@
-import { OrderMainStatuses } from "../enums/order_statuses.enum";
-import { OrderSubStatuses } from "../enums/order_sub_statuses.enum";
-import { InvalidSubStateForStateException } from "../exceptions/invalid_substate.exception";
+import { OrderMainStatuses } from '../enums/order_statuses.enum';
+import { OrderSubStatuses } from '../enums/order_sub_statuses.enum';
+import { InvalidSubStateForStateException } from '../exceptions/invalid_substate.exception';
 
 type StatusesSchema = { [key in OrderMainStatuses]: OrderSubStatuses[] };
 

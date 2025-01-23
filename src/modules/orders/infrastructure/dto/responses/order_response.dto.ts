@@ -1,7 +1,5 @@
-import { ApiGatewayResponseDTO } from "@lib/infrastructure/dtos/responses/apigateway_response.dto";
-import { IPayload } from "@lib/infrastructure/dtos/responses/response.dto";
-import { HttpStatus } from "@lib/infrastructure/enums/http_status.enum";
-import { OrderDTO } from "modules/orders/application/dtos/order.dto";
+import { ApiGatewayResponseDTO } from '@lib/infrastructure/dtos/responses/apigateway_response.dto';
+import { OrderDTO } from 'modules/orders/application/dtos/order.dto';
 
 interface IOrderAttributes {
   external_provider: string | null;
@@ -19,7 +17,7 @@ export class OrderResponseDTO extends ApiGatewayResponseDTO<IOrderAttributes> {
 
   setPayload(orderDTO: OrderDTO): this {
     super.setPayload({
-      type: "order",
+      type: 'order',
       id: orderDTO.getId(),
       attributes: {
         external_provider: orderDTO.getExternalProvider(),
@@ -33,7 +31,7 @@ export class OrderResponseDTO extends ApiGatewayResponseDTO<IOrderAttributes> {
         receiver: {
           data: {
             id: orderDTO.getReceiverId(),
-            type: "receiver",
+            type: 'receiver',
           },
         },
       },

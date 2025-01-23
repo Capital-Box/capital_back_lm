@@ -1,5 +1,5 @@
-import { IsEnum, IsString } from "class-validator";
-import { DocumentTypes } from "modules/orders/domain/enums/document_types.enum";
+import { IsEnum, IsString } from 'class-validator';
+import { DocumentTypes } from 'modules/orders/domain/enums/document_types.enum';
 
 export class DocumentDTO {
   @IsEnum(DocumentTypes)

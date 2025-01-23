@@ -1,6 +1,5 @@
-import { OrderMainStatuses } from "modules/orders/domain/enums/order_statuses.enum";
-import { OrderSubStatuses } from "modules/orders/domain/enums/order_sub_statuses.enum";
-
+import { OrderMainStatuses } from 'modules/orders/domain/enums/order_statuses.enum';
+import { OrderSubStatuses } from 'modules/orders/domain/enums/order_sub_statuses.enum';
 
 interface OrderConstructor {
   id: string;

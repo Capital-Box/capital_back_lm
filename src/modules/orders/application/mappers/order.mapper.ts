@@ -1,5 +1,5 @@
-import { Order } from "modules/orders/domain/entities/order.entity";
-import { OrderDTO } from "../dtos/order.dto";
+import { Order } from 'modules/orders/domain/entities/order.entity';
+import { OrderDTO } from '../dtos/order.dto';
 
 export class OrderMapper {
   static toDTO(order: Order): OrderDTO {

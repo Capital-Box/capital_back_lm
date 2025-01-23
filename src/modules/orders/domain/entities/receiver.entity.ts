@@ -1,7 +1,6 @@
 import { Email } from 'modules/orders/domain/value_objects/email.vo';
 import { Document } from '../value_objects/document.vo';
 import { Phone } from 'modules/orders/domain/value_objects/phone.vo';
-import { UUID } from '@shared/value_objects/uuid.vo';
 
 interface ReceiverConstructor {
   firstName: string;

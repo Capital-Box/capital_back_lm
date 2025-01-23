@@ -1,5 +1,5 @@
-import { ExternalProviders } from "../enums/external_providers.enum";
-import { ExternalProvider } from "./external_provider.vo";
+import { ExternalProviders } from '../enums/external_providers.enum';
+import { ExternalProvider } from './external_provider.vo';
 
 export class NxProvider extends ExternalProvider {
   constructor(externalId: string) {

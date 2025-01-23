@@ -1,11 +1,11 @@
-import { UUID } from "@shared/value_objects/uuid.vo";
-import { OrderStatus } from "../value_objects/order_status.vo";
-import { OrderMainStatuses } from "../enums/order_statuses.enum";
-import { OrderSubStatuses } from "../enums/order_sub_statuses.enum";
-import { Entity } from "@lib/domain/entity";
-import { OrderChangeStatusEvent } from "../events/order_change_status.event";
-import { ExternalProvider } from "../value_objects/external_provider.vo";
-import { ExternalProviders } from "../enums/external_providers.enum";
+import { UUID } from '@shared/value_objects/uuid.vo';
+import { OrderStatus } from '../value_objects/order_status.vo';
+import { OrderMainStatuses } from '../enums/order_statuses.enum';
+import { OrderSubStatuses } from '../enums/order_sub_statuses.enum';
+import { Entity } from '@lib/domain/entity';
+import { OrderChangeStatusEvent } from '../events/order_change_status.event';
+import { ExternalProvider } from '../value_objects/external_provider.vo';
+import { ExternalProviders } from '../enums/external_providers.enum';
 
 interface OrderConstructor {
   id: UUID;
@@ -60,11 +60,11 @@ export class Order extends Entity {
 
   changeStatus(
     mainStatus: OrderMainStatuses,
-    subStatus: OrderSubStatuses
+    subStatus: OrderSubStatuses,
   ): void {
     this.status.changeStatus(mainStatus, subStatus);
     this.addEvent(
-      new OrderChangeStatusEvent(this.id.getUUID(), mainStatus, subStatus)
+      new OrderChangeStatusEvent(this.id.getUUID(), mainStatus, subStatus),
     );
   }
 

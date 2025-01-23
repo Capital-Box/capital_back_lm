@@ -7,7 +7,7 @@
     "lib": "lib"
   },
   "scripts": {
-    "lint": "lerna exec -- eslint . --ext .ts,.tsx",
+    "lint": "lerna exec -- npx eslint .",
     "format": "lerna exec -- prettier --write .",
     "deploy:dev": "npx serverless deploy --stage=dev",
     "prepare": "husky"
@@ -24,6 +24,7 @@
     "class-validator": "^0.14.1"
   },
   "devDependencies": {
+    "@eslint/compat": "^1.2.5",
     "@types/aws-lambda": "^8.10.147",
     "@types/node": "^22.10.7",
     "@typescript-eslint/eslint-plugin": "^8.21.0",

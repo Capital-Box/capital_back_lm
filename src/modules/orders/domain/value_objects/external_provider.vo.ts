@@ -1,4 +1,4 @@
-import { ExternalProviders } from "../enums/external_providers.enum";
+import { ExternalProviders } from '../enums/external_providers.enum';
 
 interface ExternalProviderConstructor {
   externalId: string;

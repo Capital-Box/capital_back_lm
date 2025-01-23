@@ -1,6 +1,6 @@
-import { ExternalProviders } from "modules/orders/domain/enums/external_providers.enum";
-import { ReceiverDTO } from "./reiceiver.dto";
-import { IsEnum, IsOptional, IsString, ValidateNested } from "class-validator";
+import { ExternalProviders } from 'modules/orders/domain/enums/external_providers.enum';
+import { ReceiverDTO } from './reiceiver.dto';
+import { IsEnum, IsOptional, IsString, ValidateNested } from 'class-validator';
 
 interface CreateOrderConstructor {
   receiver: ReceiverDTO;

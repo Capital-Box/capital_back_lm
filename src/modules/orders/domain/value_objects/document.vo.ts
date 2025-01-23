@@ -1,4 +1,4 @@
-import { DocumentTypes } from "../enums/document_types.enum";
+import { DocumentTypes } from '../enums/document_types.enum';
 
 interface DocumentConstructor {
   documentType: DocumentTypes;
