@@ -7,9 +7,18 @@
     "lib": "lib"
   },
   "scripts": {
-    "deploy:dev": "npx serverless deploy --stage=dev"
+    "lint": "lerna exec -- eslint . --ext .ts,.tsx",
+    "format": "lerna exec -- prettier --write .",
+    "deploy:dev": "npx serverless deploy --stage=dev",
+    "prepare": "husky"
   },
   "author": "",
+  "workspaces": [
+    "src/modules/*"
+  ],
+  "lint-staged": {
+    "*.ts": "eslint --fix"
+  },
   "license": "ISC",
   "dependencies": {
     "class-validator": "^0.14.1"
@@ -17,7 +26,16 @@
   "devDependencies": {
     "@types/aws-lambda": "^8.10.147",
     "@types/node": "^22.10.7",
+    "@typescript-eslint/eslint-plugin": "^8.21.0",
+    "@typescript-eslint/parser": "^8.21.0",
     "aws-lambda": "^1.0.7",
+    "eslint": "^9.18.0",
+    "eslint-config-prettier": "^10.0.1",
+    "eslint-plugin-prettier": "^5.2.3",
+    "husky": "^9.1.7",
+    "lerna": "^8.1.9",
+    "lint-staged": "^15.4.1",
+    "prettier": "^3.4.2",
     "serverless": "^4.4.19",
     "typescript": "^5.7.2"
   }
