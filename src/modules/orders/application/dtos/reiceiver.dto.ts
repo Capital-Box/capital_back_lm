@@ -1,7 +1,7 @@
-import { EmailDTO } from "@shared/dtos/email.dto";
-import { PhoneDTO } from "@shared/dtos/phone.dto";
-import { DocumentDTO } from "./document.dto";
-import { IsString, ValidateNested } from "class-validator";
+import { EmailDTO } from 'modules/orders/application/dtos/email.dto';
+import { PhoneDTO } from 'modules/orders/application/dtos/phone.dto';
+import { DocumentDTO } from './document.dto';
+import { IsString, ValidateNested } from 'class-validator';
 
 interface ReceiverConstructor {
   firstName: string;

@@ -1,9 +1,8 @@
-import { Receiver } from "modules/orders/domain/entities/receiver.entity";
-import { ReceiverDTO } from "../dtos/reiceiver.dto";
-import { Document } from "modules/orders/domain/value_objects/document.vo";
-import { Email } from "@shared/value_objects/email.vo";
-import { Phone } from "@shared/value_objects/phone.vo";
-import { UUID } from "@shared/value_objects/uuid.vo";
+import { Receiver } from 'modules/orders/domain/entities/receiver.entity';
+import { ReceiverDTO } from '../dtos/reiceiver.dto';
+import { Document } from 'modules/orders/domain/value_objects/document.vo';
+import { Email } from 'modules/orders/domain/value_objects/email.vo';
+import { Phone } from 'modules/orders/domain/value_objects/phone.vo';
 
 export class ReceiverFactory {
   static create(receiver: ReceiverDTO): Receiver {

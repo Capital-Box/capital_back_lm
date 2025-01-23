@@ -1,4 +1,4 @@
-import { PhoneTypes } from "@shared/enums/phone_types.enum";
+import { PhoneTypes } from 'modules/orders/domain/enums/phone_types.enum';
 
 interface PhoneConstructor {
   phoneType: PhoneTypes;

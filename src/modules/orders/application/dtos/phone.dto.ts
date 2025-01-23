@@ -1,5 +1,5 @@
-import { IsEnum, IsString } from "class-validator";
-import { PhoneTypes } from "@shared/enums/phone_types.enum";
+import { IsEnum, IsString } from 'class-validator';
+import { PhoneTypes } from 'modules/orders/domain/enums/phone_types.enum';
 
 interface PhoneConstructor {
   phoneType: PhoneTypes;
