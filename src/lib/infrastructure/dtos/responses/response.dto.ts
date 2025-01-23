@@ -1,5 +1,5 @@
-import { Exception, IException } from "@lib/shared/exceptions/exception";
-import { HttpStatus } from "../../enums/http_status.enum";
+import { Exception, IException } from '@lib/shared/exceptions/exception';
+import { HttpStatus } from '../../enums/http_status.enum';
 
 type IRelationships = {
   [key: string]: {

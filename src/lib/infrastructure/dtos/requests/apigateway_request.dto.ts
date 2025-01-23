@@ -1,5 +1,5 @@
-import { APIGatewayProxyEventV2 } from "aws-lambda";
-import { IRequestContext, IRequestPayload, RequestDTO } from "./request.dto";
+import { APIGatewayProxyEventV2 } from 'aws-lambda';
+import { IRequestContext, IRequestPayload, RequestDTO } from './request.dto';
 
 type IRequestHeaders = {
   [key: string]: string | undefined;
@@ -18,7 +18,7 @@ type IRequestPathParameters = {
 };
 
 export abstract class ApiGatewayRequestDTO<
-  TAttributes = any
+  TAttributes = any,
 > extends RequestDTO<TAttributes> {
   private headers: IRequestHeaders;
   private queryParameters: IRequestQueryParameters;
@@ -55,7 +55,7 @@ export abstract class ApiGatewayRequestDTO<
     const multipartHeaders: IRequestHeadersMultipart = {};
     headersKeys.map((headerKey: keyof IRequestHeaders) => {
       if (headers[headerKey])
-        multipartHeaders[headerKey] = headers[headerKey].split(",");
+        multipartHeaders[headerKey] = headers[headerKey].split(',');
     });
 
     return multipartHeaders;

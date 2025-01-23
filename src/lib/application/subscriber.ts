@@ -1,5 +1,5 @@
-import { Event } from "@lib/domain/event";
-import { ISubscriber } from "./interfaces/subscriber.interface";
+import { Event } from '@lib/domain/event';
+import { ISubscriber } from './interfaces/subscriber.interface';
 
 export abstract class Subscriber implements ISubscriber {
   constructor(private subscriptionEvents: Event[]) {}

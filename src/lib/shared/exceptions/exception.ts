@@ -1,5 +1,5 @@
-import { HttpStatus } from "@lib/infrastructure/enums/http_status.enum";
-import { randomUUID } from "node:crypto";
+import { HttpStatus } from '@lib/infrastructure/enums/http_status.enum';
+import { randomUUID } from 'node:crypto';
 
 export type Meta = { [key: string]: string | object | number };
 export type Source = {
@@ -40,7 +40,7 @@ export class Exception extends Error {
 
   constructor(
     exception: ExceptionConstructor,
-    customIdGenerator: () => string = randomUUID
+    customIdGenerator: () => string = randomUUID,
   ) {
     super(`${exception.code}: ${exception.detail}`);
     this.id = customIdGenerator();

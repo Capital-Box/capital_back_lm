@@ -14,7 +14,10 @@
   },
   "author": "",
   "workspaces": [
-    "src/modules/*"
+    "src/modules/*",
+    "src/lib",
+    "src/shared",
+    "src/shared-infrastructure"
   ],
   "lint-staged": {
     "*.ts": "eslint --fix"

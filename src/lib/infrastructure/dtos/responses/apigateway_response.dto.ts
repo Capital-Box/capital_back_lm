@@ -1,15 +1,15 @@
-import { APIGatewayProxyResultV2 } from "aws-lambda";
-import { ResponseDTO } from "./response.dto";
+import { APIGatewayProxyResultV2 } from 'aws-lambda';
+import { ResponseDTO } from './response.dto';
 
 type HeaderResponse = {
   [header: string]: boolean | number | string;
 };
 
 export class ApiGatewayResponseDTO<
-  TAttributes = unknown
+  TAttributes = unknown,
 > extends ResponseDTO<TAttributes> {
   private headers: HeaderResponse = {
-    "Content-Type": "application/json",
+    'Content-Type': 'application/json',
   };
 
   constructor() {
@@ -18,7 +18,7 @@ export class ApiGatewayResponseDTO<
 
   addHeader(header: HeaderResponse) {
     Object.keys(header).forEach(
-      (headerKey) => (this.headers[headerKey] = header[headerKey])
+      (headerKey) => (this.headers[headerKey] = header[headerKey]),
     );
   }
 

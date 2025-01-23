@@ -1,5 +1,5 @@
-import { IValidator } from "@lib/application/interfaces/validator.interface";
-import { ValidationException } from "@lib/shared/exceptions/validation.exception";
+import { IValidator } from '@lib/application/interfaces/validator.interface';
+import { ValidationException } from '@lib/shared/exceptions/validation.exception';
 
 type IRelationships = {
   [key: string]: {
@@ -74,8 +74,8 @@ export abstract class RequestDTO<TAttributes = any> {
 
   getData(): IRequestData<TAttributes> {
     if (!this.payload.data)
-      throw new ValidationException("Data property is required", {
-        pointer: "/data",
+      throw new ValidationException('Data property is required', {
+        pointer: '/data',
       });
     return this.payload.data;
   }
