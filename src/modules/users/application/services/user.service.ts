@@ -8,6 +8,7 @@ import { CreateUserCase } from "../use_cases/create_user.case";
 import { UpdateUserCase } from "../use_cases/update_user.case";
 import { DeleteUserCase } from "../use_cases/delete_user.case";
 import { IResponse } from "@lib/infrastructure/dtos/responses/response.dto";
+import { UUID } from "@shared/value_objects/uuid.vo";
 
 export class UserService
   implements CreateUserCase, UpdateUserCase, DeleteUserCase
@@ -21,8 +22,11 @@ export class UserService
     return UserMapper.toDTO(savedUser);
   }
 
+
+  // Recibo un string, pero tengo que devolver un UUID? Como chota hago con el create?
   async update(updateUserDTO: UpdateUserDTO): Promise<UserDTO> {
     const userEntity = UserFactory.create({
+      id: UUID.create(),
       username: updateUserDTO.username,
       password: updateUserDTO.password,
       email: updateUserDTO.email,
@@ -34,9 +38,8 @@ export class UserService
     return UserMapper.toDTO(updatedUser);
   }
 
-  async delete(userId: string): Promise<Object> {
-    const deleteUser = await this.userRepository.delete(userId);
-    return deleteUser;
+  async delete(userId: string): Promise<void> {
+    await this.userRepository.delete(userId);
   }
 
   async list(): Promise<UserDTO[]> {

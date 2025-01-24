@@ -37,12 +37,11 @@ export class UserApiGatewayAdapter implements CreateUserPort, UpdateUserPort {
     const response = new UserResponseDTO({
       status: HttpStatus.CREATED,
       payload: {
-        id: userDTO.getEmail(),
+        id: userDTO.getId(),
         type: "user",
         attributes: {
           email: userDTO.getEmail(),
           username: userDTO.getUsername(),
-          name: userDTO.getName(),
           role: userDTO.getRole(),
           city: userDTO.getCity(),
         },

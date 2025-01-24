@@ -4,23 +4,25 @@ import { Password } from "modules/users/domain/value_objects/password.vo";
 import { Email } from "modules/users/domain/value_objects/email.vo";
 import { Role } from "modules/users/domain/value_objects/role.vo";
 import { City } from "modules/users/domain/value_objects/city.vo";
-import { Roles } from "modules/users/domain/enums/roles.enum";
-import { Cities } from "modules/users/domain/enums/cities.enum";
+import { UUID } from "@shared/value_objects/uuid.vo";
 
 export class UserMapper {
   static toEntity(user: UserDTO): User {
     return new User({
-      name: user.getUsername(),
+      id: new UUID(user.getUsername()),
+      username: user.getUsername(),
       password: new Password(user.getPassword()),
       email: new Email(user.getEmail()),
-      role: new Role(user.getRole() as Roles),
-      city: new City(user.getCity() as Cities),
+      role: new Role(user.getRole()),
+      city: new City(user.getCity()),
+      createdDate: new Date(),
+      lastUpdated: new Date(),
     });
   }
 
   static toDTO(user: User): UserDTO {
     return new UserDTO({
-      name: user.getName(),
+      username: user.getUserName(),
       password: user.getPassword(),
       email: user.getEmail(),
       role: user.getRole(),
@@ -28,3 +30,4 @@ export class UserMapper {
     });
   }
 }
+

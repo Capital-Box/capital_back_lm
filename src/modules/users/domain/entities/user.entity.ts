@@ -17,7 +17,6 @@ type IUser = {
   createdDate: Date;
   lastUpdated: Date;
 };
-
 export class User extends Entity {
   private _id: UUID;
   private _username: string;
@@ -25,7 +24,7 @@ export class User extends Entity {
   private _email: Email;
   private _role: Role;
   private _city: City;
-  private _createdDate: Date;
+  private _createdDate: Date
   private _lastUpdated: Date;
 
   constructor(user: IUser) {
@@ -70,5 +69,9 @@ export class User extends Entity {
 
   getLastUpdated(): Date {
     return this._lastUpdated;
+  }
+
+  newDateISOString(): string {
+    return new Date().toISOString();
   }
 }

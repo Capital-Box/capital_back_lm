@@ -1,7 +1,9 @@
 import { ApiGatewayRequestDTO } from "@lib/infrastructure/dtos/requests/apigateway_request.dto";
 import { ICreatePayload } from "@lib/infrastructure/dtos/requests/request.dto";
+import { UUID } from "@shared/value_objects/uuid.vo";
 
 interface IRegisterUserAttributes {
+  id: UUID;
   username: string;
   password: string;
   email: string;

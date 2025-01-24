@@ -1,4 +1,5 @@
 type IUpdateUser = {
+  id: string
   username: string;
   password?: string;
   email?: string;
@@ -7,6 +8,7 @@ type IUpdateUser = {
 };
 
 export class UpdateUserDTO {
+  public readonly id: string;
   public readonly username: string;
   public readonly password?: string;
   public readonly email?: string;
@@ -14,6 +16,7 @@ export class UpdateUserDTO {
   public readonly city?: string;
 
   constructor(updateUser: IUpdateUser) {
+    this.id = updateUser?.id;
     this.username = updateUser?.username;
     this.password = updateUser?.password;
     this.email = updateUser?.email;
