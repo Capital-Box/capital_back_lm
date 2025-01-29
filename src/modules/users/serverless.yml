@@ -47,7 +47,7 @@ functions:
       USERS_TABLE_NAME: !Ref UsersTable
     events:
       - http:
-          path: users/{user_id}
+          path: users/update/{user_id}
           method: put
 
   delete:
@@ -56,7 +56,7 @@ functions:
       USERS_TABLE_NAME: !Ref UsersTable
     events:
       - http:
-          path: users/{userId}
+          path: users/delete/{userId}
           method: delete
 
   listUsers:
@@ -76,7 +76,6 @@ functions:
       - http:
           path: users/{user_id}
           method: get
-
 
 resources:
   Resources:

@@ -25,18 +25,12 @@ provider:
           Resource:
             - arn:aws:cognito-idp:${opt:region, self:provider.region}:${aws:accountId}:userpool/${self:service}-user-pool
 
-environment:
-  COGNITO_USER_POOL_ID:
-    Ref: UserPool
-  COGNITO_CLIENT_ID:
-    Ref: UserPoolClient
-
 functions:
   login:
     handler: exports/loginFunction.handle
     environment:
-      COGNITO_USER_POOL_ID: ${self:provider.environment.COGNITO_USER_POOL_ID}
-      COGNITO_CLIENT_ID: ${self:provider.environment.COGNITO_CLIENT_ID}
+      COGNITO_USER_POOL_ID: { Ref: UserPool }
+      COGNITO_CLIENT_ID: { Ref: UserPoolClient }
     events:
       - http:
           path: auth/login
@@ -45,11 +39,20 @@ functions:
   refreshToken:
     handler: exports/refreshTokenFunction.handle
     environment:
-      COGNITO_USER_POOL_ID: ${self:provider.environment.COGNITO_USER_POOL_ID}
-      COGNITO_CLIENT_ID: ${self:provider.environment.COGNITO_CLIENT_ID}
+      COGNITO_USER_POOL_ID: { Ref: UserPool }
+      COGNITO_CLIENT_ID: { Ref: UserPoolClient }
     events:
       - http:
           path: auth/refresh-token
+          method: post
+  logout:
+    handler: exports/logoutFunction.handle
+    environment:
+      COGNITO_USER_POOL_ID: { Ref: UserPool }
+      COGNITO_CLIENT_ID: { Ref: UserPoolClient }
+    events:
+      - http:
+          path: auth/logout
           method: post
 
 resources:
@@ -61,4 +64,6 @@ resources:
     UserPoolClient:
       Type: AWS::Cognito::UserPoolClient
       Properties:
+        UserPoolId:
+          Ref: UserPool
         ClientName: ${self:service}-user-pool-client

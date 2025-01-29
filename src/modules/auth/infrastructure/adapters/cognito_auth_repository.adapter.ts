@@ -1,6 +1,7 @@
 import {
   AdminInitiateAuthCommand,
   CognitoIdentityProviderClient,
+  RevokeTokenCommand,
 } from "@aws-sdk/client-cognito-identity-provider";
 
 import { AuthRepositoryPort } from "../ports/auth_repository.port";
@@ -77,10 +78,15 @@ export class CognitoAuthRepository implements AuthRepositoryPort {
     }
   }
 
-  // async logout(refreshToken: string): Promise<void> {
-  //   try {
-  //     const command = new AdminInitiateAuthCommand({
-  //       UserPoolId: this.userPoolId,
-  //       ClientId: this.clientId,
-  //       AuthFlow: 
+  async logout(refreshToken: string): Promise<void> {
+    try {
+      const command = new RevokeTokenCommand({
+        Token: refreshToken,
+        ClientId: process.env.COGNITO_CLIENT_ID!,
+      });
+      await this.cognitoClient.send(command);
+    } catch (error: any) {
+      throw new Error("Error on logout");
+    }
+  }
 }

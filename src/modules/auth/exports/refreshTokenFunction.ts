@@ -1,10 +1,10 @@
-// src/modules/auth/exports/refreshTokenFunction.ts
 import { APIGatewayProxyEvent } from "aws-lambda";
-import { AuthService } from "../../application/services/auth.service";
-import { CognitoAuthRepository } from "../../infrastructure/adapters/cognito_auth_repository.adapter";
-import { RefreshTokenRequestDTO } from "../../infrastructure/dtos/requests/refresh_token_request.dto"; // Define uno similar a LoginRequestDTO
-import { RefreshTokenResponseDTO } from "../../infrastructure/dtos/responses/refresh_token_response.dto";
-import { TokenDTO } from "../../application/dtos/token.dto";
+import { CognitoAuthRepository } from "../infrastructure/adapters/cognito_auth_repository.adapter";
+import { AuthService } from "../application/services/auth.service";
+import { RefreshTokenRequestDTO } from "../infrastructure/dtos/request/refresh_token_request.dto";
+import { TokenDTO } from "../application/dtos/token.dto";
+import { RefreshTokenResponseDTO } from "../infrastructure/dtos/response/refresh_token.response.dto";
+
 
 export const handle = async (event: APIGatewayProxyEvent) => {
   const authRepository = new CognitoAuthRepository({
@@ -23,8 +23,8 @@ export const handle = async (event: APIGatewayProxyEvent) => {
 
   // Construir la response
   const responseDTO = new RefreshTokenResponseDTO({
-    accessToken: newTokens.accessToken,
-    refreshToken: newTokens.refreshToken,
+    access_token: newTokens.access_token,
+    refresh_token: newTokens.refresh_token,
   });
   return responseDTO.send();
 };

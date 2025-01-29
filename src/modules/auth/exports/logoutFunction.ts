@@ -1,9 +1,10 @@
-// src/modules/auth/exports/loginFunction.ts
 import { APIGatewayProxyEvent } from "aws-lambda";
 import { AuthService } from "../application/services/auth.service";
 import { CognitoAuthRepository } from "../infrastructure/adapters/cognito_auth_repository.adapter";
-import { LoginRequestDTO } from "../infrastructure/dtos/request/login_request.dto";
-import { LoginResponseDTO } from "../infrastructure/dtos/response/login_response.dto";
+import {
+    LogOutRequestDTO
+} from "../infrastructure/dtos/request/logout_request.dto";
+import { LogOutResponseDTO } from "../infrastructure/dtos/response/logout_response.dto";
 
 export const handle = async (event: APIGatewayProxyEvent) => {
   const authRepository = new CognitoAuthRepository({
@@ -13,15 +14,14 @@ export const handle = async (event: APIGatewayProxyEvent) => {
 
   const authService = new AuthService(authRepository);
 
-  const requestDTO = new LoginRequestDTO(event);
+  // Construir el request DTO
+  const requestDTO = new LogOutRequestDTO(event);
   requestDTO.validatePayload();
 
-  const validateUser = await authService.login(requestDTO);
+  // Llamar la capa de aplicación
+  const newTokens = await authService.logout(requestDTO.refresh_token);
 
-  const ResponseDTO = new LoginResponseDTO({
-    access_token: validateUser.access_token,
-    refresh_token: validateUser.refresh_token,
-  });
-
-  return ResponseDTO.send();
+  // Construir la response
+  const responseDTO = new LogOutResponseDTO();
+  return responseDTO.send();
 };

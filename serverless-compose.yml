@@ -4,8 +4,18 @@ services:
     params:
       DEPLOY_CF_ROLE: ${env:DEPLOY_CF_ROLE}
       AWS_REGION: ${env:AWS_REGION}
-  #users:
-  #  path: src/modules/users
+  auth:
+    path: src/modules/auth
+    params:
+      DEPLOY_CF_ROLE: ${env:DEPLOY_CF_ROLE}
+      AWS_REGION: ${env:AWS_REGION}
+      ROOT_APIGATEWAY: ${shared-apigateway.ApiId}
+  users:
+    path: src/modules/users
+    params: 
+      DEPLOY_CF_ROLE: ${env:DEPLOY_CF_ROLE}
+      AWS_REGION: ${env:AWS_REGION}
+      ROOT_APIGATEWAY: ${shared-apigateway.ApiId}
   orders:
     path: src/modules/orders
     params:
