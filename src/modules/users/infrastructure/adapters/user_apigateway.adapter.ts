@@ -41,7 +41,7 @@ export class UserApiGatewayAdapter implements CreateUserPort, UpdateUserPort {
         type: "user",
         attributes: {
           email: userDTO.getEmail(),
-          username: userDTO.getUsername(),
+          name: userDTO.getName(),
           role: userDTO.getRole(),
           city: userDTO.getCity(),
         },

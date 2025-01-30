@@ -2,7 +2,7 @@ import { ApiGatewayResponseDTO } from "@lib/infrastructure/dtos/responses/apigat
 
 interface IUserAttributes {
   id: string;
-  username: string;
+  name: string;
   email: string;
   role: string;
   city: string;

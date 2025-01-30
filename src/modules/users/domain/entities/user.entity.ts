@@ -9,7 +9,7 @@ import { UUID } from "@shared/value_objects/uuid.vo";
 
 type IUser = {
   id: UUID;
-  username: string;
+  name: string;
   password: Password;
   email: Email;
   role: Role;
@@ -19,7 +19,7 @@ type IUser = {
 };
 export class User extends Entity {
   private _id: UUID;
-  private _username: string;
+  private _name: string;
   private _password: Password;
   private _email: Email;
   private _role: Role;
@@ -30,7 +30,7 @@ export class User extends Entity {
   constructor(user: IUser) {
     super();
     this._id = user.id;
-    this._username = user.username;
+    this._name = user.name;
     this._password = user.password;
     this._email = user.email;
     this._role = user.role;
@@ -43,8 +43,8 @@ export class User extends Entity {
     return this._id.getUUID();
   }
 
-  getUserName(): string {
-    return this._username;
+  getName(): string {
+    return this._name;
   }
 
   getPassword(): string {

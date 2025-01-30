@@ -4,7 +4,7 @@ import { Roles } from "modules/users/domain/enums/roles.enum";
 
 type IUser = {
   id: UUID;
-  username: string;
+  name: string;
   password: string;
   email: string;
   role: Roles;
@@ -13,7 +13,7 @@ type IUser = {
 
 export class UserDTO {
   private readonly id: UUID;
-  private readonly username: string;
+  private readonly name: string;
   private readonly password: string;
   private readonly email: string;
   private readonly role: Roles;
@@ -21,7 +21,7 @@ export class UserDTO {
 
   constructor(user: IUser) {
     this.id = user.id;
-    this.username = user.username;
+    this.name = user.name;
     this.password = user.password;
     this.email = user.email;
     this.role = user.role;
@@ -32,8 +32,8 @@ export class UserDTO {
     return this.id.getUUID();
   }
 
-  getUsername(): string {
-    return this.username;
+  getName(): string {
+    return this.name;
   }
 
   getPassword(): string {
@@ -55,7 +55,7 @@ export class UserDTO {
   toObject(): IUser {
     return {
       id: this.id,
-      username: this.username,
+      name: this.name,
       password: this.password,
       email: this.email,
       role: this.role,

@@ -1,8 +1,7 @@
 import { UUID } from "@shared/value_objects/uuid.vo";
 
 type ICreateUser = {
-  id: UUID;
-  username: string;
+  name: string;
   password?: string;
   email?: string;
   role?: string;
@@ -10,16 +9,14 @@ type ICreateUser = {
 };
 
 export class CreateUserDTO {
-  public readonly id: UUID;
-  public readonly username: string;
+  public readonly name: string;
   public readonly password?: string;
   public readonly email?: string;
   public readonly role?: string;
   public readonly city?: string;
 
   constructor(user: ICreateUser) {
-    this.id = user.id;
-    this.username = user.username;
+    this.name = user.name;
     this.password = user.password;
     this.email = user.email;
     this.role = user.role;
