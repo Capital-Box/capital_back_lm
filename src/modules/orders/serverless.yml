@@ -22,6 +22,7 @@ provider:
         - Effect: Allow
           Action:
             - dynamodb:PutItem
+            - dynamodb:GetItem
           Resource:
             - !GetAtt OrderTable.Arn
         ## Allow Receiver DynamoDB
@@ -80,3 +81,15 @@ functions:
       - httpApi:
           method: POST
           path: /orders
+  change-status-order:
+    handler: ./exports/change_status_order_function.handler
+    events:
+      - httpApi:
+          method: PATCH
+          path: /orders/{id}/status
+      - httpApi:
+          method: PATCH
+          path: /orders/{id}/status/next
+      - httpApi:
+          method: PATCH
+          path: /orders/{id}/status/prev

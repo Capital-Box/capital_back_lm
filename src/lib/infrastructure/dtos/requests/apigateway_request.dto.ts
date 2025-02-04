@@ -23,6 +23,7 @@ export abstract class ApiGatewayRequestDTO<
   private headers: IRequestHeaders;
   private queryParameters: IRequestQueryParameters;
   private pathParameters: IRequestPathParameters;
+  private path: string;
 
   constructor(event: APIGatewayProxyEventV2) {
     const payload: IRequestPayload<TAttributes> = event.body
@@ -42,6 +43,7 @@ export abstract class ApiGatewayRequestDTO<
     this.headers = event.headers;
     this.queryParameters = event.queryStringParameters || {};
     this.pathParameters = event.pathParameters || {};
+    this.path = event.rawPath;
   }
 
   getHeaders(): IRequestHeaders {
@@ -59,6 +61,10 @@ export abstract class ApiGatewayRequestDTO<
     });
 
     return multipartHeaders;
+  }
+
+  getPath(): string {
+    return this.path;
   }
 
   getQueryParameters(): IRequestQueryParameters {

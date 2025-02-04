@@ -83,6 +83,28 @@ export class Order extends Entity {
     );
   }
 
+  nextStatus(): void {
+    this.status.nextStatus();
+    this.addEvent(
+      new OrderChangeStatusEvent(
+        this.id.getUUID(),
+        this.status.getMainStatus(),
+        this.status.getSubStatus(),
+      ),
+    );
+  }
+
+  prevStatus(): void {
+    this.status.prevStatus();
+    this.addEvent(
+      new OrderChangeStatusEvent(
+        this.id.getUUID(),
+        this.status.getMainStatus(),
+        this.status.getSubStatus(),
+      ),
+    );
+  }
+
   getCreatedDate(): Date {
     return this.createdDate;
   }

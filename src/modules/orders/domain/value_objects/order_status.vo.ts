@@ -1,5 +1,6 @@
 import { OrderMainStatuses } from '../enums/order_statuses.enum';
 import { OrderSubStatuses } from '../enums/order_sub_statuses.enum';
+import { OrderAlreadyHasStatusException } from '../exceptions/already_has_status.exception';
 import { InvalidSubStateForStateException } from '../exceptions/invalid_substate.exception';
 
 type StatusesSchema = { [key in OrderMainStatuses]: OrderSubStatuses[] };
@@ -62,10 +63,48 @@ export class OrderStatus {
     return schema[mainStatus].includes(subStatus);
   }
 
+  sameStatus(
+    mainStatus: OrderMainStatuses,
+    subStatus: OrderSubStatuses,
+  ): boolean {
+    return this.mainStatus === mainStatus && this.subStatus === subStatus;
+  }
+
   changeStatus(mainStatus: OrderMainStatuses, subStatus: OrderSubStatuses) {
+    if (this.sameStatus(mainStatus, subStatus))
+      throw new OrderAlreadyHasStatusException(mainStatus, subStatus);
     if (!this.isValid(mainStatus, subStatus))
       throw new InvalidSubStateForStateException(mainStatus, subStatus);
     this.mainStatus = mainStatus;
     this.subStatus = subStatus;
+  }
+
+  nextStatus() {
+    const schema = OrderStatus.getStatusesSchema();
+    const indexSubStatus = schema[this.mainStatus].indexOf(this.subStatus);
+    if (indexSubStatus === schema[this.mainStatus].length - 1) {
+      const indexMainStatus = Object.values(OrderMainStatuses).indexOf(
+        this.mainStatus,
+      );
+      this.mainStatus = Object.values(OrderMainStatuses)[indexMainStatus + 1];
+      this.subStatus = schema[this.mainStatus][0];
+    } else {
+      this.subStatus = schema[this.mainStatus][indexSubStatus + 1];
+    }
+  }
+
+  prevStatus() {
+    const schema = OrderStatus.getStatusesSchema();
+    const indexSubStatus = schema[this.mainStatus].indexOf(this.subStatus);
+    if (indexSubStatus === 0) {
+      const indexMainStatus = Object.values(OrderMainStatuses).indexOf(
+        this.mainStatus,
+      );
+      this.mainStatus = Object.values(OrderMainStatuses)[indexMainStatus - 1];
+      this.subStatus =
+        schema[this.mainStatus][schema[this.mainStatus].length - 1];
+    } else {
+      this.subStatus = schema[this.mainStatus][indexSubStatus - 1];
+    }
   }
 }

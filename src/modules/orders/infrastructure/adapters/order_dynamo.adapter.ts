@@ -1,10 +1,15 @@
 import { Order } from 'modules/orders/domain/entities/order.entity';
 import { OrderRepositoryPort } from '../ports/order_repository.port';
 
-import { DynamoDBClient, PutItemCommand } from '@aws-sdk/client-dynamodb';
+import {
+  DynamoDBClient,
+  GetItemCommand,
+  PutItemCommand,
+} from '@aws-sdk/client-dynamodb';
 import { marshall } from '@aws-sdk/util-dynamodb';
 import { LocationAddress } from 'modules/orders/domain/value_objects/location_address';
 import { Location } from 'modules/orders/domain/value_objects/location';
+import { OrderMapper } from 'modules/orders/application/mappers/order.mapper';
 
 export class OrderDynamoAdapter implements OrderRepositoryPort {
   constructor(
@@ -58,5 +63,17 @@ export class OrderDynamoAdapter implements OrderRepositoryPort {
     });
 
     await this.client.send(command);
+  }
+
+  async findById(id: string): Promise<Order> {
+    const command = new GetItemCommand({
+      TableName: this.tableName,
+      Key: marshall({ id }),
+    });
+
+    const resultItem = await this.client.send(command);
+    if (!resultItem.Item) throw new Error('Order not found');
+
+    return OrderMapper.fromDynamo(resultItem.Item);
   }
 }

@@ -10,13 +10,17 @@ import { Receiver } from 'modules/orders/domain/entities/receiver.entity';
 import { ReceiverRepositoryPort } from 'modules/orders/infrastructure/ports/receiver_repository.port';
 import { ReceiverFactory } from '../factories/receiver.factory';
 import { ReceiverDTO } from '../dtos/reiceiver.dto';
+import { ChangeOrderStatusCase } from '../use_cases/change_order_status.case';
+import { ChangeOrderStatusDTO } from '../dtos/change_order_status.dto';
+import { NextOrderStatusDTO } from '../dtos/next_order_status.dto';
+import { PrevOrderStatusDTO } from '../dtos/prev_order_status.dto';
 
 interface OrderServiceDependencies {
   orderRepository: OrderRepositoryPort;
   receiverRepository: ReceiverRepositoryPort;
   publisher?: IPublisher;
 }
-export class OrderService implements CreateOrderCase {
+export class OrderService implements CreateOrderCase, ChangeOrderStatusCase {
   constructor(private _dependencies: OrderServiceDependencies) {}
 
   private async saveReceiver(receiverDTO: ReceiverDTO): Promise<Receiver> {
@@ -31,6 +35,53 @@ export class OrderService implements CreateOrderCase {
     await this._dependencies.orderRepository.save(order);
     await this.publishEvents(order);
     return OrderMapper.toDTO(order);
+  }
+
+  private manageStatus(
+    order: Order,
+    changeOrderStatusDTO: ChangeOrderStatusDTO,
+  ): Order;
+  private manageStatus(
+    order: Order,
+    changeOrderStatusDTO: NextOrderStatusDTO,
+  ): Order;
+  private manageStatus(
+    order: Order,
+    changeOrderStatusDTO: PrevOrderStatusDTO,
+  ): Order {
+    if (changeOrderStatusDTO instanceof ChangeOrderStatusDTO) {
+      order.changeStatus(
+        changeOrderStatusDTO.main_status,
+        changeOrderStatusDTO.sub_status,
+      );
+    }
+
+    if (changeOrderStatusDTO instanceof NextOrderStatusDTO) {
+      order.nextStatus();
+    }
+
+    if (changeOrderStatusDTO instanceof PrevOrderStatusDTO) {
+      order.prevStatus();
+    }
+
+    return order;
+  }
+
+  async changeStatus(
+    changeOrderStatusDTO:
+      | ChangeOrderStatusDTO
+      | NextOrderStatusDTO
+      | PrevOrderStatusDTO,
+  ): Promise<OrderDTO> {
+    const order = await this._dependencies.orderRepository.findById(
+      changeOrderStatusDTO.id,
+    );
+
+    const orderWithNewStatus = this.manageStatus(order, changeOrderStatusDTO);
+
+    await this._dependencies.orderRepository.save(orderWithNewStatus);
+    await this.publishEvents(orderWithNewStatus);
+    return OrderMapper.toDTO(orderWithNewStatus);
   }
 
   private async publishEvents(order: Order): Promise<void> {

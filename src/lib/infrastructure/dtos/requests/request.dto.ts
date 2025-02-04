@@ -16,7 +16,7 @@ export type ICreatePayload<TAttributes> = {
   relationships?: IRelationships;
 };
 
-type IUpdatePayload<TAttributes> = {
+export type IUpdatePayload<TAttributes> = {
   id: string;
   type: string;
   attributes: TAttributes;
@@ -69,15 +69,19 @@ export abstract class RequestDTO<TAttributes = any> {
   }
 
   getPayload(): IRequestPayload<TAttributes> {
+    if (!this.payload)
+      throw new ValidationException('Body is required', {
+        pointer: '/',
+      });
     return this.payload;
   }
 
   getData(): IRequestData<TAttributes> {
-    if (!this.payload.data)
+    if (!this.getPayload().data)
       throw new ValidationException('Data property is required', {
         pointer: '/data',
       });
-    return this.payload.data;
+    return this.getPayload().data as IRequestData<TAttributes>;
   }
 
   getContext(): IRequestContext {
@@ -86,19 +90,3 @@ export abstract class RequestDTO<TAttributes = any> {
 
   abstract validatePayload(validationService: IValidator): void;
 }
-
-/*
-export class getUserByIdRequest extends RequestDTO {
-  protected getPayload(): IFindPayload<{}> {
-    return super.getPayload() as IFindPayload<{}>;
-  }
-
-  validatePayload(): void {
-    throw new Error("Method not implemented.");
-  }
-
-  getUserId(): string {
-    return this.getPayload().id;
-  }
-}
-*/
