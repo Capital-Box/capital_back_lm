@@ -1,10 +1,10 @@
-import { Event } from "@lib/domain/event";
+import { Event } from '@lib/domain/event';
 
 export class OrderChangeStatusEvent extends Event {
   constructor(
     private readonly orderId: string,
     private readonly mainStatus: string,
-    private readonly subStatus: string
+    private readonly subStatus: string,
   ) {
     super('order.change_status');
   }

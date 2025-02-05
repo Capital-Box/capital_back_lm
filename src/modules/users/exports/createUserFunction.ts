@@ -1,11 +1,11 @@
-import { APIGatewayProxyEvent } from "aws-lambda";
+import { APIGatewayProxyEventV2 } from "aws-lambda";
 import { UserService } from "../application/services/user.service";
 import { UserApiGatewayAdapter } from "../infrastructure/adapters/user_apigateway.adapter";
 import { RegisterUserRequestDTO } from "../infrastructure/dtos/requests/register_user_request.dto";
 import { DynamoDbUserRepository } from "../infrastructure/adapters/dynamodb_user_repository.adapter";
 
 // Modificar esta
-export const handle = async (req: APIGatewayProxyEvent) => {
+export const handle = async (req: APIGatewayProxyEventV2) => {
   const userRepository = new DynamoDbUserRepository({
     tableName: process.env.USERS_TABLE_NAME!,
   });

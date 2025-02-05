@@ -16,18 +16,62 @@ provider:
   # IAM role
   iam:
     deploymentRole: ${param:DEPLOY_CF_ROLE}
+    role:
+      statements:
+        ## Allow Order DynamoDB
+        - Effect: Allow
+          Action:
+            - dynamodb:PutItem
+            - dynamodb:GetItem
+          Resource:
+            - !GetAtt OrderTable.Arn
+        ## Allow Receiver DynamoDB
+        - Effect: Allow
+          Action:
+            - dynamodb:PutItem
+          Resource:
+            - !GetAtt ReceiverTable.Arn
+
+  # Environment Vars for Lambdas
+  environment:
+    ORDER_TABLE_NAME: ${self:custom.orderTableName}
+    RECEIVER_TABLE_NAME: ${self:custom.receiverTableName}
 
   # Root API
   httpApi:
     id: ${param:ROOT_APIGATEWAY}
 
-  # Environment Variables
-  #environment:
+# Custom Vars
+custom:
+  orderTableName: ${sls:stage}-orders
+  receiverTableName: ${sls:stage}-receivers
 
 # Resources
-#resources:
-#  Resources:
-#  Outputs:
+resources:
+  Resources:
+    OrderTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: ${self:custom.orderTableName}
+        BillingMode: PAY_PER_REQUEST
+        AttributeDefinitions:
+          - AttributeName: id
+            AttributeType: S
+        KeySchema:
+          - AttributeName: id
+            KeyType: HASH
+
+    ReceiverTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: ${self:custom.receiverTableName}
+        BillingMode: PAY_PER_REQUEST
+        AttributeDefinitions:
+          - AttributeName: document_number
+            AttributeType: S
+        KeySchema:
+          - AttributeName: document_number
+            KeyType: HASH
 
 # Functions
 functions:
@@ -37,3 +81,15 @@ functions:
       - httpApi:
           method: POST
           path: /orders
+  change-status-order:
+    handler: ./exports/change_status_order_function.handler
+    events:
+      - httpApi:
+          method: PATCH
+          path: /orders/{id}/status
+      - httpApi:
+          method: PATCH
+          path: /orders/{id}/status/next
+      - httpApi:
+          method: PATCH
+          path: /orders/{id}/status/prev

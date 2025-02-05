@@ -1,10 +1,14 @@
-import { OrderMainStatuses } from "modules/orders/domain/enums/order_statuses.enum";
-import { OrderSubStatuses } from "modules/orders/domain/enums/order_sub_statuses.enum";
+import { OrderMainStatuses } from 'modules/orders/domain/enums/order_statuses.enum';
+import { OrderSubStatuses } from 'modules/orders/domain/enums/order_sub_statuses.enum';
+import { LocationDTO } from './location.dto';
 
 interface OrderConstructor {
   id: string;
   externalProvider: string | null;
   externalId: string | null;
+  receiverId: string;
+  origin: LocationDTO;
+  destiny: LocationDTO;
   mainStatus: OrderMainStatuses;
   subStatus: OrderSubStatuses;
   createdDate: Date;
@@ -15,6 +19,9 @@ export class OrderDTO {
   private readonly id: string;
   private readonly externalProvider: string | null;
   private readonly externalId: string | null;
+  private readonly receiverId: string;
+  private readonly origin: LocationDTO;
+  private readonly destiny: LocationDTO;
   private readonly mainStatus: OrderMainStatuses;
   private readonly subStatus: OrderSubStatuses;
   private readonly createdDate: Date;
@@ -23,7 +30,10 @@ export class OrderDTO {
   constructor(order: OrderConstructor) {
     this.id = order.id;
     this.externalProvider = order.externalProvider;
-    this.externalId = order.externalId
+    this.externalId = order.externalId;
+    this.receiverId = order.receiverId;
+    this.origin = order.origin;
+    this.destiny = order.destiny;
     this.mainStatus = order.mainStatus;
     this.subStatus = order.subStatus;
     this.createdDate = order.createdDate;
@@ -40,6 +50,18 @@ export class OrderDTO {
 
   getExternalId(): string | null {
     return this.externalId;
+  }
+
+  getReceiverId(): string {
+    return this.receiverId;
+  }
+
+  getOrigin(): LocationDTO {
+    return this.origin;
+  }
+
+  getDestiny(): LocationDTO {
+    return this.destiny;
   }
 
   getMainStatus(): OrderMainStatuses {

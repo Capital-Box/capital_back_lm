@@ -1,15 +1,19 @@
-import { UUID } from "@shared/value_objects/uuid.vo";
-import { OrderStatus } from "../value_objects/order_status.vo";
-import { OrderMainStatuses } from "../enums/order_statuses.enum";
-import { OrderSubStatuses } from "../enums/order_sub_statuses.enum";
-import { Entity } from "@lib/domain/entity";
-import { OrderChangeStatusEvent } from "../events/order_change_status.event";
-import { ExternalProvider } from "../value_objects/external_provider.vo";
-import { ExternalProviders } from "../enums/external_providers.enum";
+import { UUID } from '@shared/value_objects/uuid.vo';
+import { OrderStatus } from '../value_objects/order_status.vo';
+import { OrderMainStatuses } from '../enums/order_statuses.enum';
+import { OrderSubStatuses } from '../enums/order_sub_statuses.enum';
+import { Entity } from '@lib/domain/entity';
+import { OrderChangeStatusEvent } from '../events/order_change_status.event';
+import { ExternalProvider } from '../value_objects/external_provider.vo';
+import { ExternalProviders } from '../enums/external_providers.enum';
+import { Location } from '../value_objects/location';
 
 interface OrderConstructor {
   id: UUID;
   externalProvider: ExternalProvider | null;
+  receiverId: string;
+  origin: Location;
+  destiny: Location;
   status: OrderStatus;
   createdDate: Date;
   lastUpdated: Date;
@@ -18,6 +22,9 @@ interface OrderConstructor {
 export class Order extends Entity {
   private readonly id: UUID;
   private readonly externalProvider: ExternalProvider | null;
+  private readonly receiverId: string;
+  private readonly origin: Location;
+  private readonly destiny: Location;
   private readonly status: OrderStatus;
   private readonly createdDate: Date;
   private readonly lastUpdated: Date;
@@ -26,6 +33,9 @@ export class Order extends Entity {
     super();
     this.id = order.id;
     this.externalProvider = order.externalProvider;
+    this.receiverId = order.receiverId;
+    this.origin = order.origin;
+    this.destiny = order.destiny;
     this.status = order.status;
     this.createdDate = order.createdDate;
     this.lastUpdated = order.lastUpdated;
@@ -33,6 +43,10 @@ export class Order extends Entity {
 
   getId(): string {
     return this.id.getUUID();
+  }
+
+  getReceiverId(): string {
+    return this.receiverId;
   }
 
   getExternalProvider(): ExternalProviders | null {
@@ -43,6 +57,14 @@ export class Order extends Entity {
     return this.externalProvider?.getExternalId() || null;
   }
 
+  getOrigin(): Location {
+    return this.origin;
+  }
+
+  getDestiny(): Location {
+    return this.destiny;
+  }
+
   getMainStatus(): OrderMainStatuses {
     return this.status.getMainStatus();
   }
@@ -51,9 +73,36 @@ export class Order extends Entity {
     return this.status.getSubStatus();
   }
 
-  changeStatus(mainStatus: OrderMainStatuses, subStatus: OrderSubStatuses): void {
+  changeStatus(
+    mainStatus: OrderMainStatuses,
+    subStatus: OrderSubStatuses,
+  ): void {
     this.status.changeStatus(mainStatus, subStatus);
-    this.addEvent(new OrderChangeStatusEvent(this.id.getUUID(), mainStatus, subStatus));
+    this.addEvent(
+      new OrderChangeStatusEvent(this.id.getUUID(), mainStatus, subStatus),
+    );
+  }
+
+  nextStatus(): void {
+    this.status.nextStatus();
+    this.addEvent(
+      new OrderChangeStatusEvent(
+        this.id.getUUID(),
+        this.status.getMainStatus(),
+        this.status.getSubStatus(),
+      ),
+    );
+  }
+
+  prevStatus(): void {
+    this.status.prevStatus();
+    this.addEvent(
+      new OrderChangeStatusEvent(
+        this.id.getUUID(),
+        this.status.getMainStatus(),
+        this.status.getSubStatus(),
+      ),
+    );
   }
 
   getCreatedDate(): Date {

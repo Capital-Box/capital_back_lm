@@ -1,10 +1,10 @@
-import { Event } from "@lib/domain/event";
-import { IPublisher } from "./interfaces/publisher.interface";
-import { ISubscriber } from "./interfaces/subscriber.interface";
+import { Event } from '@lib/domain/event';
+import { IPublisher } from './interfaces/publisher.interface';
+import { ISubscriber } from './interfaces/subscriber.interface';
 
 export class Publisher implements IPublisher {
   private subscribers: {
-    [key: Event["event_type"]]: ISubscriber[] | undefined;
+    [key: Event['event_type']]: ISubscriber[] | undefined;
   } = {};
 
   subscribe(subscriber: ISubscriber): void {
@@ -19,7 +19,7 @@ export class Publisher implements IPublisher {
     const executeSubscribers: Promise<void>[] = [];
     for (const event of events) {
       this.subscribers[event.getEventType()]?.forEach((subscriber) =>
-        executeSubscribers.push(subscriber.invoke(event))
+        executeSubscribers.push(subscriber.invoke(event)),
       );
     }
 

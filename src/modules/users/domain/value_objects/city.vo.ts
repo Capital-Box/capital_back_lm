@@ -1,4 +1,4 @@
-import { Cities } from "../enums/cities.enum";
+import { Cities } from '../enums/cities.enum';
 
 export class City {
   constructor(private _city: Cities) {}

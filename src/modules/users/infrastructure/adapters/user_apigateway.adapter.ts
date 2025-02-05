@@ -24,14 +24,14 @@ interface UserApiGatewayAdapterDependencies {
 
 export class UserApiGatewayAdapter implements CreateUserPort, UpdateUserPort {
   constructor(
-    private readonly dependencies: UserApiGatewayAdapterDependencies
+    private readonly dependencies: UserApiGatewayAdapterDependencies,
   ) {}
 
   async createUser(req: RegisterUserRequestDTO): Promise<UserResponseDTO> {
     req.validatePayload();
     const reqPayload = req.getPayload();
     const createUserDTO: CreateUserDTO = new CreateUserDTO(
-      reqPayload.attributes
+      reqPayload.attributes,
     );
     const userDTO = await this.dependencies.service.create(createUserDTO);
     const response = new UserResponseDTO({

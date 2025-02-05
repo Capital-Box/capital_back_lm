@@ -1,5 +1,5 @@
-import { ApiGatewayRequestDTO } from "@lib/infrastructure/dtos/requests/apigateway_request.dto";
-import { ICreatePayload } from "@lib/infrastructure/dtos/requests/request.dto";
+import { ApiGatewayRequestDTO } from '@lib/infrastructure/dtos/requests/apigateway_request.dto';
+import { ICreatePayload } from '@lib/infrastructure/dtos/requests/request.dto';
 
 interface IRegisterUserAttributes {
   email: string;

@@ -1,4 +1,4 @@
-import { Event } from "@lib/domain/event";
+import { Event } from '@lib/domain/event';
 
 export interface ISubscriber {
   getSubscriptionsEvents(): Event[];
