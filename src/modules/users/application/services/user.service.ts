@@ -17,7 +17,10 @@ export class UserService
   ) {}
 
   async create(createUserDTO: CreateUserDTO): Promise<UserDTO> {
-    // const userExists = await this.checkExists(createUserDTO.email);
+    const userExists = await this.checkExists(createUserDTO.email);
+    if (userExists) {
+      throw new Error("User already exists");
+    }
     const userEntity = await UserFactory.create(createUserDTO, this.hashService);
     // const saveAuth = await this.authRepository.save(userEntity);
     const savedUser = await this.userRepository.save(userEntity);
@@ -57,14 +60,26 @@ export class UserService
     return users.map((user) => UserMapper.toDTO(user));
   }
 
-  // private async checkExists(email: string): Promise<boolean> {
-  //   const user = await this.userRepository.findById(userId);
-  //   return user ? true : false;
-  // }
+  private async checkExists(email: string): Promise<boolean> {
+    const user = await this.userRepository.findByEmail(email);
+    return user ? true : false;
+  }
 
-  // async findById(userId: string): Promise<UserDTO> {
-  // }
+  async findById(userId: string): Promise<UserDTO> {
+    const user = await this.userRepository.findById(userId);
+    if (!user) {
+      throw new Error("User not found");
+    }
+    return UserMapper.toDTO(user);
+  }
 
-  // async findByEmail(email: string): Promise<UserDTO> { 
-  // }
+  async findByEmail(email: string): Promise<UserDTO> {
+    const user = await this.userRepository.findById(email);
+    if (!user) {
+      throw new Error("User not found");
+    }
+    return UserMapper.toDTO(user);
+  }
+
 }
+

@@ -1,4 +1,4 @@
-import { APIGatewayProxyEvent, APIGatewayProxyEventV2 } from "aws-lambda";
+import { APIGatewayProxyEventV2 } from "aws-lambda";
 import { UserService } from "../application/services/user.service";
 import { UserApiGatewayAdapter } from "../infrastructure/adapters/user_apigateway.adapter";
 import { UpdateUserRequestDTO } from "../infrastructure/dtos/requests/update_user_request.dto";

@@ -77,6 +77,7 @@ functions:
           path: users/{user_id}
           method: get
 
+
 resources:
   Resources:
     UsersTable:
@@ -87,6 +88,43 @@ resources:
         AttributeDefinitions:
           - AttributeName: PK
             AttributeType: S
+          - AttributeName: email
+            AttributeType: S
+          - AttributeName: role
+            AttributeType: S
+          - AttributeName: createdDate
+            AttributeType: S
+          - AttributeName: all
+            AttributeType: S
         KeySchema:
           - AttributeName: PK
             KeyType: HASH
+        GlobalSecondaryIndexes:
+          - IndexName: "email"
+            KeySchema:
+              - AttributeName: email
+                KeyType: HASH
+            Projection:
+              ProjectionType: ALL
+          - IndexName: "role"
+            KeySchema:
+              - AttributeName: role
+                KeyType: HASH
+            Projection:
+              ProjectionType: ALL
+          - IndexName: "roleCreatedDate"
+            KeySchema:
+              - AttributeName: role
+                KeyType: HASH
+              - AttributeName: createdDate
+                KeyType: RANGE
+            Projection:
+              ProjectionType: ALL
+          - IndexName: "allUsers"
+            KeySchema:
+              - AttributeName: all
+                KeyType: HASH
+              - AttributeName: createdDate
+                KeyType: RANGE
+            Projection:
+              ProjectionType: ALL

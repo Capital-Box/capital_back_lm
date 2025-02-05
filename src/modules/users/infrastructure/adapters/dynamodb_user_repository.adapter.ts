@@ -2,17 +2,12 @@ import {
   DynamoDBClient,
   GetItemCommand,
   PutItemCommand,
+  QueryCommand,
   ReturnValue,
-  ScanCommand,
-  UpdateItemCommand,
+  UpdateItemCommand
 } from "@aws-sdk/client-dynamodb";
 import { marshall, unmarshall } from "@aws-sdk/util-dynamodb";
-import { UUID } from "@shared/value_objects/uuid.vo";
 import { User } from "modules/users/domain/entities/user.entity";
-import { City } from "modules/users/domain/value_objects/city.vo";
-import { Email } from "modules/users/domain/value_objects/email.vo";
-import { Password } from "modules/users/domain/value_objects/password.vo";
-import { Role } from "modules/users/domain/value_objects/role.vo";
 import { UserRepositoryPort } from "../ports/user_repository.port";
 
 interface DynamoDbUserRepositoryDependencies {
@@ -141,22 +136,64 @@ export class DynamoDbUserRepository implements UserRepositoryPort {
     }
   }
 
+  async findByEmail(email: string): Promise<User | null> {
+    const params = {
+      TableName: this.tableName,
+      IndexName: "email",
+      KeyConditionExpression: "#email = :email",
+      ExpressionAttributeNames: {
+        "#email": "email",
+      },
+      ExpressionAttributeValues: marshall({
+        ":email": email,
+      }),
+    };
+    const result = await this.client.send(new QueryCommand(params));
+    if (!result.Items || !result.Items.length) {
+      return null;
+    }
+    const data = unmarshall(result.Items[0]);
+    if (data.isDeleted) {
+      return null;
+    }
+    return new User({
+      id: data.PK,
+      name: data.name,
+      password: data.password,
+      email: data.email,
+      role: data.role,
+      city: data.city,
+      createdDate: data.createdDate,
+      lastUpdated: data.lastUpdated,
+    });
+  }
+
   async list(): Promise<User[]> {
-    const scanResult = await this.client.send(
-      new ScanCommand({ TableName: this.tableName })
-    );
-    if (!scanResult.Items) return [];
-    return scanResult.Items.map((item) => {
-      const unmarshalled = unmarshall(item);
+    const params = {
+      TableName: this.tableName,
+      IndexName: "allUsers",
+      KeyConditionExpression: "#all = :all",
+      ExpressionAttributeNames: {
+        "#all": "all",
+      },
+      ExpressionAttributeValues: marshall({
+        ":all": "USER",
+      }),
+      ScanIndexForward: false,
+    };
+    const result = await this.client.send(new QueryCommand(params));
+    if (!result.Items) return [];
+    return result.Items.map(item => {
+      const data = unmarshall(item);
       return new User({
-        id: unmarshalled.PK,
-        name: unmarshalled.name,
-        password: unmarshalled.password,
-        email: unmarshalled.email,
-        role: unmarshalled.role,
-        city: unmarshalled.city,
-        createdDate: unmarshalled.createdDate,
-        lastUpdated: unmarshalled.lastUpdated,
+        id: data.PK,
+        name: data.name,
+        password: data.password,
+        email: data.email,
+        role: data.role,
+        city: data.city,
+        createdDate: data.createdDate,
+        lastUpdated: data.lastUpdated,
       });
     });
   }
