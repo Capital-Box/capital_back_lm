@@ -9,15 +9,14 @@ interface ILoginAttributes {
 
 export class LoginUserResponseDTO extends ApiGatewayResponseDTO<ILoginAttributes> {
   constructor(tokens: ILoginAttributes) {
-    super({
-      status: HttpStatus.OK,
-      payload: {
-        id: tokens.id,
-        type: "auth",
-        attributes: {
-          access_token: tokens.access_token,
-          refresh_token: tokens.refresh_token,
-        },
+    super();
+    this.setStatus(HttpStatus.OK);
+    this.setPayload({
+      id: tokens.id,
+      type: "auth",
+      attributes: {
+        access_token: tokens.access_token,
+        refresh_token: tokens.refresh_token,
       },
     });
   }

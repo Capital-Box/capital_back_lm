@@ -6,6 +6,7 @@ import { Email } from "../value_objects/email.vo";
 import { Password } from "../value_objects/password.vo";
 import { Role } from "../value_objects/role.vo";
 import { UUID } from "@shared/value_objects/uuid.vo";
+import { IHasheable } from "modules/users/application/interfaces/iHash.interface";
 
 type IUser = {
   id: UUID;
@@ -74,4 +75,35 @@ export class User extends Entity {
   newDateISOString(): string {
     return new Date().toISOString();
   }
+
+  setName(name: string): void {
+    this._name = name;
+  }
+
+  async setPassword(password: string, hashService: IHasheable): Promise<void> {
+    this._password = await Password.create(password, { hashService });
+  }
+
+  setEmail(email: string): void {
+    this._email = new Email(email);
+  }
+
+  setRole(role: string): void {
+    if (!Role.isValid(role)) {
+      throw new Error(`Invalid role: ${role}`);
+    }
+    this._role = new Role(role);
+  }
+
+  setCity(city: string): void {
+    if (!City.isValid(city)) {
+      throw new Error(`Invalid city: ${city}`);
+    }
+    this._city = new City(city);
+  }
+
+  setLastUpdated(): void {
+    this._lastUpdated = new Date();
+  }
+  
 }

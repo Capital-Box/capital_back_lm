@@ -1,4 +1,3 @@
-import { IResponse } from "@lib/infrastructure/dtos/responses/response.dto";
 import { User } from "modules/users/domain/entities/user.entity";
 
 

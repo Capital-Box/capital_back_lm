@@ -8,13 +8,13 @@ interface ILoginUserAttributes {
 
 export class LoginUserRequestDTO extends ApiGatewayRequestDTO<ILoginUserAttributes> {
     validatePayload(): void {
-        const payload = this.getPayload().attributes;
-        if (!payload.username) {
+        const payload = this.getPayload().data;
+        if (!payload) {
             throw new Error("El nombre de usuario es obligatorio");
         }
     }
 
-    getPayload(): ICreatePayload<ILoginUserAttributes> {
+    getData(): ICreatePayload<ILoginUserAttributes> {
         return super.getPayload() as ICreatePayload<ILoginUserAttributes>;
     }
 }

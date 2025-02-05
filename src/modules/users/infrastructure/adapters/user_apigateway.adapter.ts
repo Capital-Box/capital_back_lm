@@ -17,6 +17,9 @@ import {
 import { ListUsersCase } from "modules/users/application/use_cases/list_users.case";
 import { DeleteUserResponseDTO } from "../dtos/responses/delete_user_response.dto";
 import { UserListResponseDTO } from "../dtos/responses/user_list_response.dto";
+import { Exception } from "@lib/shared/exceptions/exception";
+import { UnexpectedException } from "@lib/shared/exceptions/unexpected.exception";
+import { ValidationException } from "@lib/shared/exceptions/validation.exception";
 
 interface UserApiGatewayAdapterDependencies {
   service: CreateUserCase & UpdateUserCase & DeleteUserCase & ListUsersCase;
@@ -28,43 +31,66 @@ export class UserApiGatewayAdapter implements CreateUserPort, UpdateUserPort {
   ) {}
 
   async createUser(req: RegisterUserRequestDTO): Promise<UserResponseDTO> {
-    req.validatePayload();
-    const reqPayload = req.getPayload();
-    const createUserDTO: CreateUserDTO = new CreateUserDTO(
-      reqPayload.attributes,
-    );
-    const userDTO = await this.dependencies.service.create(createUserDTO);
-    const response = new UserResponseDTO({
-      status: HttpStatus.CREATED,
-      payload: {
-        id: userDTO.getId(),
-        type: "user",
-        attributes: {
-          email: userDTO.getEmail(),
-          name: userDTO.getName(),
-          role: userDTO.getRole(),
-          city: userDTO.getCity(),
-        },
-      },
-    });
-    return response;
+    const response = new UserResponseDTO();
+    try{
+      req.validatePayload();
+      const data = req.getData();
+      const createUserDTO = new CreateUserDTO({
+        email: data.attributes.email,
+        password: data.attributes.password,
+        name: data.attributes.name,
+        role: data.attributes.role,
+        city: data.attributes.city,
+      });
+      const userDTO = await this.dependencies.service.create(createUserDTO);
+      return response.setStatus(HttpStatus.CREATED).setPayload(userDTO);
+      } catch (error: Exception[] | Exception | unknown) {
+            if (
+              Array.isArray(error) &&
+              error.every((errorItem) => errorItem instanceof ValidationException)
+            )
+              return response.setStatus(ValidationException.status).setErrors(error);
+      
+            if (error instanceof Exception)
+              return response.setErrors([error]).setStatus(error.getStatusCode());
+      
+            return response
+              .setStatus(UnexpectedException.status)
+              .setErrors([new UnexpectedException(error as Error)]);
+          }
   }
 
   async updateUser(req: UpdateUserRequestDTO): Promise<UserResponseDTO> {
-    req.validatePayload();
-    req.validateParameters();
-    const reqPayload = req.getPayload().attributes;
-    const updateUserDTO = new UpdateUserDTO(reqPayload);
-    const userDTO = await this.dependencies.service.update(updateUserDTO);
-    const response = new UserResponseDTO({
-      status: HttpStatus.OK,
-      payload: {
-        id: userDTO.getEmail(),
-        type: "update",
-        attributes: userDTO.toObject(),
-      },
-    });
-    return response;
+    const response = new UserResponseDTO()
+    try{
+      req.validatePayload();
+      req.validateParameters();
+      const data = req.getData();
+      const updateUserDTO = new UpdateUserDTO({
+        id: data.id,
+        email: data.attributes.email,
+        password: data.attributes.password,
+        name: data.attributes.name,
+        role: data.attributes.role,
+        city: data.attributes.city,
+      });
+      const userDTO = await this.dependencies.service.update(updateUserDTO);
+      return response.setStatus(HttpStatus.OK).setPayload(userDTO);
+    } catch (error: Exception[] | Exception | unknown) {
+      if (
+        Array.isArray(error) &&
+        error.every((errorItem) => errorItem instanceof ValidationException)
+      )
+        return response.setStatus(ValidationException.status).setErrors(error);
+  
+      if (error instanceof Exception)
+        return response.setErrors([error]).setStatus(error.getStatusCode());
+  
+      return response
+        .setStatus(UnexpectedException.status)
+        .setErrors([new UnexpectedException(error as Error)]);
+    }
+   
   }
 
   async deleteUser(req: DeleteUserRequestDTO): Promise<DeleteUserResponseDTO> {

@@ -1,10 +1,10 @@
+import { IValidator } from "@lib/application/interfaces/validator.interface";
 import { ApiGatewayRequestDTO } from "@lib/infrastructure/dtos/requests/apigateway_request.dto";
-import { ICreatePayload } from "@lib/infrastructure/dtos/requests/request.dto";
-import { UUID } from "@shared/value_objects/uuid.vo";
+import { IUpdatePayload } from "@lib/infrastructure/dtos/requests/request.dto";
 
 interface IUpdateUserAttributes {
   id: string;
-  username: string;
+  name: string;
   password: string;
   email: string;
   role: string;
@@ -13,8 +13,8 @@ interface IUpdateUserAttributes {
 
 export class UpdateUserRequestDTO extends ApiGatewayRequestDTO<IUpdateUserAttributes> {
   validatePayload(): void {
-    const payload = this.getPayload().attributes;
-    if (!payload.username) {
+    const payload = this.getPayload();
+    if (!payload.data) {
       throw new Error("El nombre de usuario es obligatorio");
     }
   }
@@ -25,11 +25,11 @@ export class UpdateUserRequestDTO extends ApiGatewayRequestDTO<IUpdateUserAttrib
     }
   }
 
-  getPayload(): ICreatePayload<IUpdateUserAttributes> {
-    return super.getPayload() as ICreatePayload<IUpdateUserAttributes>;
+  getData(): IUpdatePayload<IUpdateUserAttributes> {
+    return super.getData() as IUpdatePayload<IUpdateUserAttributes>;
   }
 
   getUserId(): string {
-    return this.getPayload().attributes.id;
+    return this.getData().id;
   }
 }

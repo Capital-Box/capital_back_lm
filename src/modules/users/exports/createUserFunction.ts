@@ -3,6 +3,7 @@ import { UserService } from "../application/services/user.service";
 import { UserApiGatewayAdapter } from "../infrastructure/adapters/user_apigateway.adapter";
 import { RegisterUserRequestDTO } from "../infrastructure/dtos/requests/register_user_request.dto";
 import { DynamoDbUserRepository } from "../infrastructure/adapters/dynamodb_user_repository.adapter";
+import { ArgonHashService } from "../application/services/argon.service";
 
 // Modificar esta
 export const handle = async (req: APIGatewayProxyEventV2) => {
@@ -11,7 +12,7 @@ export const handle = async (req: APIGatewayProxyEventV2) => {
   });
 
   // 2. Crear el servicio
-  const userService = new UserService(userRepository);
+  const userService = new UserService(userRepository, new ArgonHashService());
 
   // 3. Instancia el adaptador de entrada
   const userAdapter = new UserApiGatewayAdapter({

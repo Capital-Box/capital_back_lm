@@ -1,5 +1,4 @@
 import { ApiGatewayRequestDTO } from "@lib/infrastructure/dtos/requests/apigateway_request.dto";
-import { ICreatePayload } from "@lib/infrastructure/dtos/requests/request.dto";
 
 interface IDeleteUserAttributes {
     userId: string;
@@ -21,6 +20,4 @@ export class DeleteUserRequestDTO extends ApiGatewayRequestDTO<IDeleteUserAttrib
     getUserId(): string {
         return this.getPathParameters().userId!;
       }
-
-
 }

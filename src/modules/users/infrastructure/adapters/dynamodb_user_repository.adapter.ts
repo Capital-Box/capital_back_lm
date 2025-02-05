@@ -33,7 +33,7 @@ export class DynamoDbUserRepository implements UserRepositoryPort {
       TableName: this.tableName,
       Item: marshall({
         PK: user.getId(),
-        username: user.getUserName(),
+        name: user.getName(),
         password: user.getPassword(),
         email: user.getEmail(),
         role: user.getRole(),
@@ -61,16 +61,16 @@ export class DynamoDbUserRepository implements UserRepositoryPort {
       TableName: this.tableName,
       Key: marshall({ PK: user.getId() }),
       UpdateExpression:
-        "SET #username = :username, #role = :role, #city = :city, #password = :password, #lastUpdated = :lastUpdated",
+        "SET #name = :name, #role = :role, #city = :city, #password = :password, #lastUpdated = :lastUpdated",
       ExpressionAttributeNames: {
-        "#username": "username",
+        "#name": "name",
         "#role": "role",
         "#city": "city",
         "#password": "password",
         "#lastUpdated": "lastUpdated",
       },
       ExpressionAttributeValues: marshall({
-        ":username": user.getUserName(),
+        ":name": user.getName(),
         ":role": user.getRole(),
         ":city": user.getCity(),
         ":password": user.getPassword(),
@@ -122,18 +122,18 @@ export class DynamoDbUserRepository implements UserRepositoryPort {
       }
       const data = unmarshall(Item);
       if (data.isDeleted) {
+        console.log("User is deleted");
         return null;
       }
-
       return new User({
-        id: UUID.create(data.PK),
-        username: data.username,
-        password: new Password(data.password),
-        email: new Email(data.email),
-        role: new Role(data.role),
-        city: new City(data.city),
-        createdDate: new Date(data.createdDate),
-        lastUpdated: new Date(data.lastUpdated),
+        id: data.PK,
+        name: data.name,
+        password: data.password,
+        email: data.email,
+        role: data.role,
+        city: data.city,
+        createdDate: data.createdDate,
+        lastUpdated: data.lastUpdated,
       });
 
     } catch (error: any) {
@@ -141,7 +141,6 @@ export class DynamoDbUserRepository implements UserRepositoryPort {
     }
   }
 
-  // Revisar poco performante ya que todavia no tenemos GSI, yo lo dejaria asi. Tendriamos menos de 100 usuarios
   async list(): Promise<User[]> {
     const scanResult = await this.client.send(
       new ScanCommand({ TableName: this.tableName })
@@ -150,14 +149,14 @@ export class DynamoDbUserRepository implements UserRepositoryPort {
     return scanResult.Items.map((item) => {
       const unmarshalled = unmarshall(item);
       return new User({
-        id: UUID.create(unmarshalled.PK),
-        username: unmarshalled.username,
-        password: new Password(unmarshalled.password),
-        email: new Email(unmarshalled.email),
-        role: new Role(unmarshalled.role),
-        city: new City(unmarshalled.city),
-        createdDate: new Date(unmarshalled.createdDate),
-        lastUpdated: new Date(unmarshalled.lastUpdated),
+        id: unmarshalled.PK,
+        name: unmarshalled.name,
+        password: unmarshalled.password,
+        email: unmarshalled.email,
+        role: unmarshalled.role,
+        city: unmarshalled.city,
+        createdDate: unmarshalled.createdDate,
+        lastUpdated: unmarshalled.lastUpdated,
       });
     });
   }

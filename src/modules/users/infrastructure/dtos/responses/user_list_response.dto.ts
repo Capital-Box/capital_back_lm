@@ -12,18 +12,19 @@ interface IUserListAttributes {
 
 export class UserListResponseDTO extends ApiGatewayResponseDTO<IUserListAttributes> {
   constructor(users: UserDTO[]) {
-    super({
-      status: HttpStatus.OK,
-      payload: users.map((user) => ({
-        id: user.getUsername(),
+    super();
+    this.setStatus(HttpStatus.OK);
+    this.setPayload(
+      users.map((user) => ({
+        id: user.getId(),
         type: "user",
         attributes: {
-          name: user.getUsername(),
+          name: user.getName(),
           email: user.getEmail(),
           role: user.getRole(),
           city: user.getCity(),
         },
-      })),
-    });
+      }))
+    );
   }
 }
