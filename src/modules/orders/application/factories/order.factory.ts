@@ -7,6 +7,7 @@ import { OrderSubStatuses } from 'modules/orders/domain/enums/order_sub_statuses
 import { ExternalProviderFactory } from './external_provider.factory';
 import { ReceiverFactory } from './receiver.factory';
 import { LocationFactory } from './location.factory';
+import { PackageFactory } from './package.factory';
 
 export class OrderFactory {
   static create(createOrderDTO: CreateOrderDTO): Order {
@@ -29,6 +30,9 @@ export class OrderFactory {
       status,
       origin,
       destiny,
+      packages: createOrderDTO.packages.map((pack) =>
+        PackageFactory.create(pack),
+      ),
       createdDate: new Date(),
       lastUpdated: new Date(),
     });

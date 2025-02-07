@@ -1,7 +1,15 @@
 import { ExternalProviders } from 'modules/orders/domain/enums/external_providers.enum';
 import { ReceiverDTO } from './reiceiver.dto';
-import { IsEnum, IsOptional, IsString, ValidateNested } from 'class-validator';
+import {
+  ArrayMinSize,
+  IsArray,
+  IsEnum,
+  IsOptional,
+  IsString,
+  ValidateNested,
+} from 'class-validator';
 import { LocationDTO } from './location.dto';
+import { CreatePackageDTO } from './create_package.dto';
 
 interface CreateOrderConstructor {
   receiver: ReceiverDTO;
@@ -9,6 +17,7 @@ interface CreateOrderConstructor {
   externalId: string | null;
   origin: LocationDTO;
   destiny: LocationDTO;
+  packages: CreatePackageDTO[];
 }
 
 export class CreateOrderDTO {
@@ -29,11 +38,17 @@ export class CreateOrderDTO {
   @ValidateNested()
   public destiny: LocationDTO;
 
+  @IsArray()
+  @ArrayMinSize(1)
+  @ValidateNested({ each: true })
+  public packages: CreatePackageDTO[];
+
   constructor(createOrder: CreateOrderConstructor) {
     this.externalProvider = createOrder.externalProvider;
     this.externalId = createOrder.externalId;
     this.receiver = createOrder.receiver;
     this.origin = createOrder.origin;
     this.destiny = createOrder.destiny;
+    this.packages = createOrder.packages;
   }
 }

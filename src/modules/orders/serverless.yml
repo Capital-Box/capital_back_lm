@@ -31,11 +31,18 @@ provider:
             - dynamodb:PutItem
           Resource:
             - !GetAtt ReceiverTable.Arn
+        ## Allow Package DynamoDB
+        - Effect: Allow
+          Action:
+            - dynamodb:BatchWriteItem
+          Resource:
+            - !GetAtt PackageTable.Arn
 
   # Environment Vars for Lambdas
   environment:
     ORDER_TABLE_NAME: ${self:custom.orderTableName}
     RECEIVER_TABLE_NAME: ${self:custom.receiverTableName}
+    PACKAGE_TABLE_NAME: ${self:custom.packageTableName}
 
   # Root API
   httpApi:
@@ -45,6 +52,7 @@ provider:
 custom:
   orderTableName: ${sls:stage}-orders
   receiverTableName: ${sls:stage}-receivers
+  packageTableName: ${sls:stage}-packages
 
 # Resources
 resources:
@@ -71,6 +79,18 @@ resources:
             AttributeType: S
         KeySchema:
           - AttributeName: document_number
+            KeyType: HASH
+
+    PackageTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: ${self:custom.packageTableName}
+        BillingMode: PAY_PER_REQUEST
+        AttributeDefinitions:
+          - AttributeName: id
+            AttributeType: S
+        KeySchema:
+          - AttributeName: id
             KeyType: HASH
 
 # Functions

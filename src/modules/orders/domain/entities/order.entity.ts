@@ -7,6 +7,7 @@ import { OrderChangeStatusEvent } from '../events/order_change_status.event';
 import { ExternalProvider } from '../value_objects/external_provider.vo';
 import { ExternalProviders } from '../enums/external_providers.enum';
 import { Location } from '../value_objects/location';
+import { Package } from './package.entity';
 
 interface OrderConstructor {
   id: UUID;
@@ -15,6 +16,7 @@ interface OrderConstructor {
   origin: Location;
   destiny: Location;
   status: OrderStatus;
+  packages: Package[];
   createdDate: Date;
   lastUpdated: Date;
 }
@@ -26,6 +28,7 @@ export class Order extends Entity {
   private readonly origin: Location;
   private readonly destiny: Location;
   private readonly status: OrderStatus;
+  private readonly packages: Package[];
   private readonly createdDate: Date;
   private readonly lastUpdated: Date;
 
@@ -37,6 +40,7 @@ export class Order extends Entity {
     this.origin = order.origin;
     this.destiny = order.destiny;
     this.status = order.status;
+    this.packages = order.packages;
     this.createdDate = order.createdDate;
     this.lastUpdated = order.lastUpdated;
   }
@@ -103,6 +107,10 @@ export class Order extends Entity {
         this.status.getSubStatus(),
       ),
     );
+  }
+
+  getPackages(): Package[] {
+    return this.packages;
   }
 
   getCreatedDate(): Date {

@@ -14,10 +14,13 @@ import { ChangeOrderStatusCase } from '../use_cases/change_order_status.case';
 import { ChangeOrderStatusDTO } from '../dtos/change_order_status.dto';
 import { NextOrderStatusDTO } from '../dtos/next_order_status.dto';
 import { PrevOrderStatusDTO } from '../dtos/prev_order_status.dto';
+import { Package } from 'modules/orders/domain/entities/package.entity';
+import { PackageRepositoryPort } from 'modules/orders/infrastructure/ports/package_repository.port';
 
 interface OrderServiceDependencies {
   orderRepository: OrderRepositoryPort;
   receiverRepository: ReceiverRepositoryPort;
+  packageRepository: PackageRepositoryPort;
   publisher?: IPublisher;
 }
 export class OrderService implements CreateOrderCase, ChangeOrderStatusCase {
@@ -29,9 +32,15 @@ export class OrderService implements CreateOrderCase, ChangeOrderStatusCase {
     return receiver;
   }
 
+  private async savePackages(packages: Package[]): Promise<Package[]> {
+    await this._dependencies.packageRepository.saveMany(packages);
+    return packages;
+  }
+
   async save(createOrderDTO: CreateOrderDTO): Promise<OrderDTO> {
     const order = OrderFactory.create(createOrderDTO);
     await this.saveReceiver(createOrderDTO.receiver);
+    await this.savePackages(order.getPackages());
     await this._dependencies.orderRepository.save(order);
     await this.publishEvents(order);
     return OrderMapper.toDTO(order);

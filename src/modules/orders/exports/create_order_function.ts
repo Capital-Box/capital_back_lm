@@ -5,15 +5,20 @@ import { OrderDynamoAdapter } from '../infrastructure/adapters/order_dynamo.adap
 import { ReceiverDynamoAdapter } from '../infrastructure/adapters/receiver_dynamo.adapter';
 import { CreateOrderRequestDTO } from '../infrastructure/dto/requests/create_order_request.dto';
 import { ClassValidatorService } from '@lib/application/service/class_validator.service';
+import { PackageDynamoAdapter } from '../infrastructure/adapters/package_dynamo.adapter';
 
 const orderDynamoAdapter = new OrderDynamoAdapter(process.env.ORDER_TABLE_NAME);
 const receiverDynamoAdapter = new ReceiverDynamoAdapter(
   process.env.RECEIVER_TABLE_NAME,
 );
+const packageDynamoAdapter = new PackageDynamoAdapter(
+  process.env.PACKAGE_TABLE_NAME,
+);
 
 const orderService = new OrderService({
   orderRepository: orderDynamoAdapter,
   receiverRepository: receiverDynamoAdapter,
+  packageRepository: packageDynamoAdapter,
 });
 
 const classValidatorService = new ClassValidatorService();
