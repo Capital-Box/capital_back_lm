@@ -13,6 +13,7 @@ import { LocationTypes } from 'modules/orders/domain/enums/location_types.enum';
 import { LocationDTO } from 'modules/orders/application/dtos/location.dto';
 import { LocationAddressDTO } from 'modules/orders/application/dtos/location_address.dto';
 import { GeoLocationDTO } from 'modules/orders/application/dtos/geo_location.dto';
+import { PackageMapper } from 'modules/orders/application/mappers/package.mapper';
 
 interface ICreateOrderAttributes {
   origin: {
@@ -61,6 +62,12 @@ interface ICreateOrderAttributes {
       number: string;
     };
   };
+  packages: {
+    name: string;
+    reference_number: string;
+    sku: string;
+    quantity: number;
+  }[];
 }
 
 export class CreateOrderRequestDTO extends ApiGatewayRequestDTO<ICreateOrderAttributes> {
@@ -131,6 +138,9 @@ export class CreateOrderRequestDTO extends ApiGatewayRequestDTO<ICreateOrderAttr
       destiny,
       externalProvider: null,
       externalId: null,
+      packages: orderAttributes.packages.map((pack) =>
+        PackageMapper.fromRequest(pack),
+      ),
     });
     return createOrderDTO;
   }

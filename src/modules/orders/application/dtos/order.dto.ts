@@ -1,6 +1,7 @@
 import { OrderMainStatuses } from 'modules/orders/domain/enums/order_statuses.enum';
 import { OrderSubStatuses } from 'modules/orders/domain/enums/order_sub_statuses.enum';
 import { LocationDTO } from './location.dto';
+import { PackageDTO } from './package.dto';
 
 interface OrderConstructor {
   id: string;
@@ -11,6 +12,7 @@ interface OrderConstructor {
   destiny: LocationDTO;
   mainStatus: OrderMainStatuses;
   subStatus: OrderSubStatuses;
+  packages: PackageDTO[];
   createdDate: Date;
   lastUpdated: Date;
 }
@@ -24,6 +26,7 @@ export class OrderDTO {
   private readonly destiny: LocationDTO;
   private readonly mainStatus: OrderMainStatuses;
   private readonly subStatus: OrderSubStatuses;
+  private readonly packages: PackageDTO[];
   private readonly createdDate: Date;
   private readonly lastUpdated: Date;
 
@@ -36,6 +39,7 @@ export class OrderDTO {
     this.destiny = order.destiny;
     this.mainStatus = order.mainStatus;
     this.subStatus = order.subStatus;
+    this.packages = order.packages;
     this.createdDate = order.createdDate;
     this.lastUpdated = order.lastUpdated;
   }
@@ -70,6 +74,10 @@ export class OrderDTO {
 
   getSubStatus(): OrderSubStatuses {
     return this.subStatus;
+  }
+
+  getPackages(): PackageDTO[] {
+    return this.packages;
   }
 
   getCreatedDate(): Date {

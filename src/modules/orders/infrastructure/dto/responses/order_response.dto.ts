@@ -36,6 +36,14 @@ export class OrderResponseDTO extends ApiGatewayResponseDTO<IOrderAttributes> {
             type: 'receiver',
           },
         },
+        packages: orderDTO.getPackages().map((pack) => {
+          return {
+            data: {
+              id: pack.id,
+              type: 'package',
+            },
+          };
+        }),
       },
     });
     return this;

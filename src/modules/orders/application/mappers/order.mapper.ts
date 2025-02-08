@@ -12,6 +12,7 @@ import { ExternalProvider } from 'modules/orders/domain/value_objects/external_p
 import { LocationTypes } from 'modules/orders/domain/enums/location_types.enum';
 import { GeoLocation } from 'modules/orders/domain/value_objects/geo_location';
 import { OrderStatus } from 'modules/orders/domain/value_objects/order_status.vo';
+import { PackageMapper } from './package.mapper';
 
 export class OrderMapper {
   private static serializeLocation(
@@ -89,6 +90,7 @@ export class OrderMapper {
       subStatus: order.getSubStatus(),
       origin: this.serializeLocation(order.getOrigin()),
       destiny: this.serializeLocation(order.getDestiny()),
+      packages: order.getPackages().map((pack) => PackageMapper.toDTO(pack)),
       createdDate: order.getCreatedDate(),
       lastUpdated: order.getLastUpdated(),
     });
@@ -110,6 +112,7 @@ export class OrderMapper {
         mainStatus: orderItem['main_status'],
         subStatus: orderItem['sub_status'],
       }),
+      packages: [],
       createdDate: new Date(orderItem['created_date']),
       lastUpdated: new Date(orderItem['last_updated']),
     });
