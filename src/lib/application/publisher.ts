@@ -4,15 +4,15 @@ import { ISubscriber } from './interfaces/subscriber.interface';
 
 export class Publisher implements IPublisher {
   private subscribers: {
-    [key: Event['event_type']]: ISubscriber[] | undefined;
+    [key: string]: ISubscriber[] | undefined;
   } = {};
 
-  subscribe(subscriber: ISubscriber): void {
+  subscribe(subscriber: ISubscriber): Publisher {
     for (const event of subscriber.getSubscriptionsEvents()) {
-      const eventType = event.getEventType();
-      if (!this.subscribers[eventType]) this.subscribers[eventType] = [];
-      this.subscribers[eventType].push(subscriber);
+      if (!this.subscribers[event]) this.subscribers[event] = [];
+      this.subscribers[event].push(subscriber);
     }
+    return this;
   }
 
   async publish(events: Event[]): Promise<void> {

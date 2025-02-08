@@ -1,23 +1,34 @@
 import { Event } from '@lib/domain/event';
+import { UUID } from '@shared/value_objects/uuid.vo';
+import { OrderStatus } from '../value_objects/order_status.vo';
 
 export class OrderChangeStatusEvent extends Event {
+  static event_type = 'order.change_status';
+
+  getEventType(): string {
+    return OrderChangeStatusEvent.event_type;
+  }
+
   constructor(
-    private readonly orderId: string,
-    private readonly mainStatus: string,
-    private readonly subStatus: string,
+    private readonly orderId: UUID,
+    private readonly status: OrderStatus,
   ) {
-    super('order.change_status');
+    super();
   }
 
   getOrderId(): string {
-    return this.orderId;
+    return this.orderId.getUUID();
+  }
+
+  getStatus(): OrderStatus {
+    return this.status;
   }
 
   getMainStatus(): string {
-    return this.mainStatus;
+    return this.status.getMainStatus();
   }
 
   getSubStatus(): string {
-    return this.subStatus;
+    return this.status.getSubStatus();
   }
 }

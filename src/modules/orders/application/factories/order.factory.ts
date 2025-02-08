@@ -8,6 +8,7 @@ import { ExternalProviderFactory } from './external_provider.factory';
 import { ReceiverFactory } from './receiver.factory';
 import { LocationFactory } from './location.factory';
 import { PackageFactory } from './package.factory';
+import { OrderChangeStatusEvent } from 'modules/orders/domain/events/order_change_status.event';
 
 export class OrderFactory {
   static create(createOrderDTO: CreateOrderDTO): Order {
@@ -23,7 +24,7 @@ export class OrderFactory {
     const receiver = ReceiverFactory.create(createOrderDTO.receiver);
     const origin = LocationFactory.create(createOrderDTO.origin);
     const destiny = LocationFactory.create(createOrderDTO.destiny);
-    return new Order({
+    const order = new Order({
       id,
       externalProvider,
       receiverId: receiver.getDocument().getDocumentNumber(),
@@ -36,5 +37,8 @@ export class OrderFactory {
       createdDate: new Date(),
       lastUpdated: new Date(),
     });
+
+    order.addEvent(new OrderChangeStatusEvent(id, order.getOrderStatus()));
+    return order;
   }
 }
