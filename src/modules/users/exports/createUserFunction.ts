@@ -1,10 +1,9 @@
-import { APIGatewayProxyEventV2 } from "aws-lambda";
-import { UserService } from "../application/services/user.service";
-import { UserApiGatewayAdapter } from "../infrastructure/adapters/user_apigateway.adapter";
-import { RegisterUserRequestDTO } from "../infrastructure/dtos/requests/register_user_request.dto";
-import { DynamoDbUserRepository } from "../infrastructure/adapters/dynamodb_user_repository.adapter";
-import { ArgonHashService } from "../application/services/argon.service";
-import { BcryptHashService } from "../application/services/bcrypt.service";
+import { APIGatewayProxyEventV2 } from 'aws-lambda';
+import { BcryptHashService } from '../application/services/bcrypt.service';
+import { UserService } from '../application/services/user.service';
+import { DynamoDbUserRepository } from '../infrastructure/adapters/dynamodb_user_repository.adapter';
+import { UserApiGatewayAdapter } from '../infrastructure/adapters/user_apigateway.adapter';
+import { RegisterUserRequestDTO } from '../infrastructure/dtos/requests/register_user_request.dto';
 
 // Modificar esta
 export const handle = async (req: APIGatewayProxyEventV2) => {

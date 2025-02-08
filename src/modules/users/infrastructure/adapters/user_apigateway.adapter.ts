@@ -1,30 +1,25 @@
-import { CreateUserDTO } from "modules/users/application/dtos/create_user.dto";
-import { UpdateUserDTO } from "modules/users/application/dtos/update_user.dto";
-import { CreateUserCase } from "modules/users/application/use_cases/create_user.case";
-import { UpdateUserCase } from "modules/users/application/use_cases/update_user.case";
-import { RegisterUserRequestDTO } from "../dtos/requests/register_user_request.dto";
-import { UpdateUserRequestDTO } from "../dtos/requests/update_user_request.dto";
-import { UserResponseDTO } from "../dtos/responses/user_response.dto";
-import { CreateUserPort } from "../ports/create_user.port";
-import { UpdateUserPort } from "../ports/update_user.port";
-import { HttpStatus } from "@lib/infrastructure/enums/http_status.enum";
-import { DeleteUserRequestDTO } from "../dtos/requests/delete_user_request.dto";
-import { DeleteUserCase } from "modules/users/application/use_cases/delete_user.case";
-import {
-  IResponse,
-  ResponseDTO,
-} from "@lib/infrastructure/dtos/responses/response.dto";
-import { ListUsersCase } from "modules/users/application/use_cases/list_users.case";
-import { DeleteUserResponseDTO } from "../dtos/responses/delete_user_response.dto";
-import { UserListResponseDTO } from "../dtos/responses/user_list_response.dto";
-import { Exception } from "@lib/shared/exceptions/exception";
-import { UnexpectedException } from "@lib/shared/exceptions/unexpected.exception";
-import { ValidationException } from "@lib/shared/exceptions/validation.exception";
+import { HttpStatus } from '@lib/infrastructure/enums/http_status.enum';
+import { Exception } from '@lib/shared/exceptions/exception';
+import { UnexpectedException } from '@lib/shared/exceptions/unexpected.exception';
+import { ValidationException } from '@lib/shared/exceptions/validation.exception';
+import { CreateUserDTO } from 'modules/users/application/dtos/create_user.dto';
+import { UpdateUserDTO } from 'modules/users/application/dtos/update_user.dto';
+import { CreateUserCase } from 'modules/users/application/use_cases/create_user.case';
+import { DeleteUserCase } from 'modules/users/application/use_cases/delete_user.case';
+import { ListUsersCase } from 'modules/users/application/use_cases/list_users.case';
+import { UpdateUserCase } from 'modules/users/application/use_cases/update_user.case';
+import { DeleteUserRequestDTO } from '../dtos/requests/delete_user_request.dto';
+import { RegisterUserRequestDTO } from '../dtos/requests/register_user_request.dto';
+import { UpdateUserRequestDTO } from '../dtos/requests/update_user_request.dto';
+import { DeleteUserResponseDTO } from '../dtos/responses/delete_user_response.dto';
+import { UserListResponseDTO } from '../dtos/responses/user_list_response.dto';
+import { UserResponseDTO } from '../dtos/responses/user_response.dto';
+import { CreateUserPort } from '../ports/create_user.port';
+import { UpdateUserPort } from '../ports/update_user.port';
 
 interface UserApiGatewayAdapterDependencies {
   service: CreateUserCase & UpdateUserCase & DeleteUserCase & ListUsersCase;
 }
-
 export class UserApiGatewayAdapter implements CreateUserPort, UpdateUserPort {
   constructor(
     private readonly dependencies: UserApiGatewayAdapterDependencies,
@@ -32,7 +27,7 @@ export class UserApiGatewayAdapter implements CreateUserPort, UpdateUserPort {
 
   async createUser(req: RegisterUserRequestDTO): Promise<UserResponseDTO> {
     const response = new UserResponseDTO();
-    try{
+    try {
       req.validatePayload();
       const data = req.getData();
       const createUserDTO = new CreateUserDTO({
@@ -44,25 +39,25 @@ export class UserApiGatewayAdapter implements CreateUserPort, UpdateUserPort {
       });
       const userDTO = await this.dependencies.service.create(createUserDTO);
       return response.setStatus(HttpStatus.CREATED).setPayload(userDTO);
-      } catch (error: Exception[] | Exception | unknown) {
-            if (
-              Array.isArray(error) &&
-              error.every((errorItem) => errorItem instanceof ValidationException)
-            )
-              return response.setStatus(ValidationException.status).setErrors(error);
-      
-            if (error instanceof Exception)
-              return response.setErrors([error]).setStatus(error.getStatusCode());
-      
-            return response
-              .setStatus(UnexpectedException.status)
-              .setErrors([new UnexpectedException(error as Error)]);
-          }
+    } catch (error: Exception[] | Exception | unknown) {
+      if (
+        Array.isArray(error) &&
+        error.every((errorItem) => errorItem instanceof ValidationException)
+      )
+        return response.setStatus(ValidationException.status).setErrors(error);
+
+      if (error instanceof Exception)
+        return response.setErrors([error]).setStatus(error.getStatusCode());
+
+      return response
+        .setStatus(UnexpectedException.status)
+        .setErrors([new UnexpectedException(error as Error)]);
+    }
   }
 
   async updateUser(req: UpdateUserRequestDTO): Promise<UserResponseDTO> {
-    const response = new UserResponseDTO()
-    try{
+    const response = new UserResponseDTO();
+    try {
       req.validatePayload();
       req.validateParameters();
       const data = req.getData();
@@ -82,15 +77,14 @@ export class UserApiGatewayAdapter implements CreateUserPort, UpdateUserPort {
         error.every((errorItem) => errorItem instanceof ValidationException)
       )
         return response.setStatus(ValidationException.status).setErrors(error);
-  
+
       if (error instanceof Exception)
         return response.setErrors([error]).setStatus(error.getStatusCode());
-  
+
       return response
         .setStatus(UnexpectedException.status)
         .setErrors([new UnexpectedException(error as Error)]);
     }
-   
   }
 
   async deleteUser(req: DeleteUserRequestDTO): Promise<DeleteUserResponseDTO> {
@@ -100,7 +94,7 @@ export class UserApiGatewayAdapter implements CreateUserPort, UpdateUserPort {
       await this.dependencies.service.delete(userId);
       return new DeleteUserResponseDTO(userId);
     } catch (error: any) {
-      return new DeleteUserResponseDTO("Error deleting User");
+      return new DeleteUserResponseDTO('Error deleting User');
     }
   }
 
