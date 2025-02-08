@@ -1,5 +1,5 @@
-import { APIGatewayProxyEvent } from "aws-lambda";
-import { IRequestContext, IRequestPayload, RequestDTO } from "./request.dto";
+import { APIGatewayProxyEventV2 } from 'aws-lambda';
+import { IRequestContext, IRequestPayload, RequestDTO } from './request.dto';
 
 type IRequestHeaders = {
   [key: string]: string | undefined;
@@ -18,13 +18,14 @@ type IRequestPathParameters = {
 };
 
 export abstract class ApiGatewayRequestDTO<
-  TAttributes = any
+  TAttributes = any,
 > extends RequestDTO<TAttributes> {
   private headers: IRequestHeaders;
   private queryParameters: IRequestQueryParameters;
   private pathParameters: IRequestPathParameters;
+  private path: string;
 
-  constructor(event: APIGatewayProxyEvent) {
+  constructor(event: APIGatewayProxyEventV2) {
     const payload: IRequestPayload<TAttributes> = event.body
       ? JSON.parse(event.body)
       : null;
@@ -32,7 +33,7 @@ export abstract class ApiGatewayRequestDTO<
       requestId: event.requestContext.requestId,
       identity: {
         source: event.requestContext.apiId,
-        sub: event.requestContext.identity.user || undefined,
+        sub: '',
       },
     };
     super({
@@ -42,6 +43,7 @@ export abstract class ApiGatewayRequestDTO<
     this.headers = event.headers;
     this.queryParameters = event.queryStringParameters || {};
     this.pathParameters = event.pathParameters || {};
+    this.path = event.rawPath;
   }
 
   getHeaders(): IRequestHeaders {
@@ -55,10 +57,14 @@ export abstract class ApiGatewayRequestDTO<
     const multipartHeaders: IRequestHeadersMultipart = {};
     headersKeys.map((headerKey: keyof IRequestHeaders) => {
       if (headers[headerKey])
-        multipartHeaders[headerKey] = headers[headerKey].split(",");
+        multipartHeaders[headerKey] = headers[headerKey].split(',');
     });
 
     return multipartHeaders;
+  }
+
+  getPath(): string {
+    return this.path;
   }
 
   getQueryParameters(): IRequestQueryParameters {

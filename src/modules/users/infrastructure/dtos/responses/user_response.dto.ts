@@ -1,4 +1,4 @@
-import { ApiGatewayResponseDTO } from "@lib/infrastructure/dtos/responses/apigateway_response.dto";
+import { ApiGatewayResponseDTO } from '@lib/infrastructure/dtos/responses/apigateway_response.dto';
 
 interface IUserAttributes {
   username: string;

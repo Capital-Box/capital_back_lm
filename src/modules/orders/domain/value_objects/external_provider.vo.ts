@@ -1,24 +1,24 @@
-import { ExternalProviders } from "../enums/external_providers.enum";
+import { ExternalProviders } from '../enums/external_providers.enum';
 
 interface ExternalProviderConstructor {
-  external_id: string;
-  external_provider: ExternalProviders;
+  externalId: string;
+  externalProvider: ExternalProviders;
 }
 
 export class ExternalProvider {
-  private external_id: string;
-  private external_provider: ExternalProviders;
+  private externalId: string;
+  private externalProvider: ExternalProviders;
 
-  constructor(externalProvider: ExternalProviderConstructor){
-    this.external_id = externalProvider.external_id;
-    this.external_provider = externalProvider.external_provider;
+  constructor(externalProvider: ExternalProviderConstructor) {
+    this.externalId = externalProvider.externalId;
+    this.externalProvider = externalProvider.externalProvider;
   }
 
   getExternalId(): string {
-    return this.external_id;
+    return this.externalId;
   }
 
   getExternalProvider(): ExternalProviders {
-    return this.external_provider;
+    return this.externalProvider;
   }
 }

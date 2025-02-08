@@ -1,7 +1,7 @@
-import { APIGatewayProxyEvent } from "aws-lambda";
-import { UserService } from "../application/services/user.service";
-import { UserApiGatewayAdapter } from "../infrastructure/adapters/user_apigateway.adapter";
-import { RegisterUserRequestDTO } from "../infrastructure/dtos/requests/register_user_request.dto";
+import { APIGatewayProxyEvent } from 'aws-lambda';
+import { UserService } from '../application/services/user.service';
+import { UserApiGatewayAdapter } from '../infrastructure/adapters/user_apigateway.adapter';
+import { RegisterUserRequestDTO } from '../infrastructure/dtos/requests/register_user_request.dto';
 
 const userService = new UserService();
 const userApiGatewayAdapter = new UserApiGatewayAdapter({

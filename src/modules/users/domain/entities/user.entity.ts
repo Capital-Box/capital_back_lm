@@ -1,10 +1,10 @@
-import { Entity } from "@lib/domain/entity";
-import { Cities } from "../enums/cities.enum";
-import { Roles } from "../enums/roles.enum";
-import { City } from "../value_objects/city.vo";
-import { Email } from "../value_objects/email.vo";
-import { Password } from "../value_objects/password.vo";
-import { Role } from "../value_objects/role.vo";
+import { Entity } from '@lib/domain/entity';
+import { Cities } from '../enums/cities.enum';
+import { Roles } from '../enums/roles.enum';
+import { City } from '../value_objects/city.vo';
+import { Email } from '../value_objects/email.vo';
+import { Password } from '../value_objects/password.vo';
+import { Role } from '../value_objects/role.vo';
 
 type IUser = {
   username: string;
