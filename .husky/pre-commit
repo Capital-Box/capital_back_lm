@@ -1,1 +1,6 @@
+#!/bin/sh
+if ! command -v bash &> /dev/null
+then
+    export PATH="$PATH:/c/Program Files/Git/usr/bin"
+fi
 npx lint-staged
