@@ -98,7 +98,6 @@ export class OrderMapper {
 
   static fromDynamo(orderDTO: Record<string, AttributeValue>): Order {
     const orderItem = unmarshall(orderDTO);
-
     const order = new Order({
       id: new UUID(orderItem['id']),
       externalProvider: new ExternalProvider({
