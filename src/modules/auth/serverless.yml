@@ -22,8 +22,14 @@ provider:
             - cognito-idp:AdminCreateUser
             - cognito-idp:AdminSetUserPassword
             - cognito-idp:AdminUpdateUserAttributes
+            - lambda:InvokeFunction
           Resource:
             - arn:aws:cognito-idp:${opt:region, self:provider.region}:${aws:accountId}:userpool/${self:service}-user-pool
+            - ${param:authUserArn}
+
+  environment:
+  COGNITO_USER_POOL_ID: !Ref UserPool
+  COGNITO_CLIENT_ID: !Ref UserPoolClient
 
 functions:
   login:
@@ -54,7 +60,8 @@ functions:
       - http:
           path: auth/logout
           method: post
-
+  save: 
+    handler: exports/createUserFunction.handle
 resources:
   Resources:
     UserPool:
@@ -67,3 +74,8 @@ resources:
         UserPoolId:
           Ref: UserPool
         ClientName: ${self:service}-user-pool-client
+  Outputs:
+    saveAuthUser:
+      Value: !Ref SaveLambdaFunction
+    saveAuthUserArn:
+      Value: !GetAtt SaveLambdaFunction.Arn

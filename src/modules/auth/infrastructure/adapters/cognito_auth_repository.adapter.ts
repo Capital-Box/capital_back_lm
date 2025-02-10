@@ -9,6 +9,8 @@ import {
 import { AuthRepositoryPort } from '../ports/auth_repository.port';
 import { TokenDTO } from 'modules/auth/application/dtos/token.dto';
 import { User } from 'modules/users/domain/entities/user.entity';
+import { CreateUserDTO } from 'modules/users/application/dtos/create_user.dto';
+import { CreateAuthDTO } from '../dtos/request/create_auth.dto';
 
 interface CognitoAuthRepositoryDependencies {
   userPoolId: string;
@@ -85,7 +87,7 @@ export class CognitoAuthRepository implements AuthRepositoryPort {
     try {
       const command = new RevokeTokenCommand({
         Token: refreshToken,
-        ClientId: process.env.COGNITO_CLIENT_ID!,
+        ClientId: this.clientId,
       });
       await this.cognitoClient.send(command);
     } catch (error: any) {
@@ -93,54 +95,58 @@ export class CognitoAuthRepository implements AuthRepositoryPort {
     }
   }
 
-  async save(user: User): Promise<void> {
+  async save(user: CreateAuthDTO): Promise<void> {
     try {
-      console.log('entre auth Save')
+      console.log('userpoolid', this.userPoolId);
+      console.log('clientId', this.clientId);
       console.log(user);
+      const data = user.getData().attributes;
       const newUser = {
-        Username: user.getId(),
-        Password: user.getPassword(),
+        Username: data.username,
+        Password: data.password,
         UserAttributes: [
           {
             Name: 'email',
-            Value: user.getEmail(),
+            Value: data.email,
           },
           {
             Name: 'email_verified',
             Value: 'true',
           },
-          {
-            Name: 'created_date',
-            Value: user.getCreatedDate().toISOString(),
-          },
-          {
-            Name: 'lastUpdated',
-            Value: user.getLastUpdated().toISOString(),
-          },
         ],
       };
-
-      await this.cognitoClient.send(
-        new AdminCreateUserCommand({
-          UserPoolId: this.userPoolId,
-          Username: newUser.Username,
-          TemporaryPassword: newUser.Password,
-          UserAttributes: newUser.UserAttributes,
-        }),
-      );
-      // Seteamos la contraseña del usuario permanente
-      await this.changePassword(user, user.getPassword());
+      console.log(newUser);
+      try {
+        await this.cognitoClient.send(
+          new AdminCreateUserCommand({
+            UserPoolId: this.userPoolId!,
+            Username: newUser.Username,
+            TemporaryPassword: newUser.Password,
+            UserAttributes: newUser.UserAttributes,
+          }),
+        );
+      } catch (error: any) {
+        console.error('Error creating user in Cognito:', error);
+        throw new Error(`Error creating user: ${error.message}`);
+      }
+      try {
+        await this.changePassword(data.username, data.password);
+      } catch (error: any) {
+        console.error('Error setting permanent password in Cognito:', error);
+        throw new Error(`Error setting permanent password: ${error.message}`);
+      }
     } catch (error: any) {
-      throw new Error('Error on save user');
+      console.error('Error in save method:', error);
+      throw new Error(`Error on save user: ${error.message}`);
     }
   }
 
-  async changePassword(user: User, password: string): Promise<void> {
+  async changePassword(username: string, password: string): Promise<void> {
     try {
       await this.cognitoClient.send(
         new AdminSetUserPasswordCommand({
           UserPoolId: this.userPoolId,
-          Username: user.getId(),
+          Username: username,
           Password: password,
           Permanent: true,
         }),

@@ -33,6 +33,7 @@ provider:
 # Variables de entorno para la tabla
 environment:
   USERS_TABLE_NAME: !Ref UsersTable
+  saveAuthUser: ${param:saveAuthUser}
 
 functions:
   create:

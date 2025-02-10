@@ -15,7 +15,8 @@ services:
     params: 
       DEPLOY_CF_ROLE: ${env:DEPLOY_CF_ROLE}
       AWS_REGION: ${env:AWS_REGION}
-      ROOT_APIGATEWAY: ${shared-apigateway.ApiId}
+      ROOT_APIGATEWAY: ${shared-apigateway.ApiId} 
+      saveAuthUser: ${auth.saveAuthUser}
   orders:
     path: src/modules/orders
     params:

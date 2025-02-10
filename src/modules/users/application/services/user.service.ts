@@ -8,7 +8,7 @@ import { UserMapper } from '../mappers/user.mapper';
 import { CreateUserCase } from '../use_cases/create_user.case';
 import { DeleteUserCase } from '../use_cases/delete_user.case';
 import { UpdateUserCase } from '../use_cases/update_user.case';
-import { AuthRepositoryPort } from 'modules/auth/infrastructure/ports/auth_repository.port';
+import { InvokeCommand, InvokeCommandInput, LambdaClient } from '@aws-sdk/client-lambda';
 
 export class UserService
   implements CreateUserCase, UpdateUserCase, DeleteUserCase
@@ -16,7 +16,8 @@ export class UserService
   constructor(
     private readonly userRepository: UserRepositoryPort,
     private readonly hashService: IHasheable,
-    private readonly authRepository: AuthRepositoryPort,
+    private client = new LambdaClient(),
+
   ) {}
 
   async create(createUserDTO: CreateUserDTO): Promise<UserDTO> {
@@ -28,8 +29,26 @@ export class UserService
       createUserDTO,
       this.hashService,
     );
+    const invokeLambdaInputParams: InvokeCommandInput = {
+      FunctionName: process.env.saveAuthUser,
+      Payload: JSON.stringify({
+        "data": {
+          "type": "register",
+          "attributes": {
+            "username": userEntity.getId(),
+            "email": userEntity.getEmail(),
+            "password": createUserDTO.password,
+          }
+        }
+      }),
+    };
+    console.log('invokeLambdaInputParams', invokeLambdaInputParams);
+    const invokeCommand: InvokeCommand = new InvokeCommand(
+      invokeLambdaInputParams,
+    );
+    this.client.send(invokeCommand);
     console.log('saveAuth', userEntity);
-    const saveAuth = await this.authRepository.save(userEntity);
+    
     const savedUser = await this.userRepository.save(userEntity);
     const userDTO = UserMapper.toDTO(savedUser);
     return userDTO;
@@ -60,7 +79,7 @@ export class UserService
 
   private async checkExists(email: string): Promise<boolean> {
     console.log('entre al checkExists', email);
-    const user = await this.userRepository.findByEmail(email);
+    const user = await this.userRepository.findByEmail(email, this.hashService);
     return user ? true : false;
   }
 
@@ -73,10 +92,12 @@ export class UserService
   }
 
   async findByEmail(email: string): Promise<UserDTO> {
-    const user = await this.userRepository.findByEmail(email);
+    const user = await this.userRepository.findByEmail(email, this.hashService);
     if (!user) {
       throw new Error('User not found');
     }
     return UserMapper.toDTO(user);
   }
+
+  
 }

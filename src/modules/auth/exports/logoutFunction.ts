@@ -1,12 +1,12 @@
-import { APIGatewayProxyEvent } from "aws-lambda";
+import { APIGatewayProxyEventV2 } from "aws-lambda";
 import { AuthService } from "../application/services/auth.service";
 import { CognitoAuthRepository } from "../infrastructure/adapters/cognito_auth_repository.adapter";
 import {
-    LogOutRequestDTO
+  LogOutRequestDTO
 } from "../infrastructure/dtos/request/logout_request.dto";
 import { LogOutResponseDTO } from "../infrastructure/dtos/response/logout_response.dto";
 
-export const handle = async (event: APIGatewayProxyEvent) => {
+export const handle = async (event: APIGatewayProxyEventV2) => {
   const authRepository = new CognitoAuthRepository({
     userPoolId: process.env.COGNITO_USER_POOL_ID,
     clientId: process.env.COGNITO_CLIENT_ID,
