@@ -48,8 +48,8 @@ export class User extends Entity {
     return this._name;
   }
 
-  getPassword(): string {
-    return this._password.getPassword();
+  getPassword(sensitive: boolean = true): string {
+    return this._password.getPassword(sensitive);
   }
 
   getEmail() {
@@ -70,10 +70,6 @@ export class User extends Entity {
 
   getLastUpdated(): Date {
     return this._lastUpdated;
-  }
-
-  newDateISOString(): string {
-    return new Date().toISOString();
   }
 
   setName(name: string): void {

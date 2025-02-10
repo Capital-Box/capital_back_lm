@@ -23,9 +23,12 @@ provider:
             - dynamodb:GetItem
             - dynamodb:UpdateItem
             - dynamodb:DeleteItem
+            - dynamodb:Query
             - dynamodb:Scan
           Resource: 
             - !GetAtt UsersTable.Arn
+            - !Sub "arn:aws:dynamodb:${AWS::Region}:${AWS::AccountId}:table/${UsersTable}/index/*"
+
 
 # Variables de entorno para la tabla
 environment:
@@ -128,3 +131,8 @@ resources:
                 KeyType: RANGE
             Projection:
               ProjectionType: ALL
+
+build:
+  esbuild:
+    external:
+      - 'argon2'

@@ -4,11 +4,11 @@ import { IUpdatePayload } from "@lib/infrastructure/dtos/requests/request.dto";
 
 interface IUpdateUserAttributes {
   id: string;
-  name: string;
-  password: string;
-  email: string;
-  role: string;
-  city: string;
+  name?: string;
+  password?: string;
+  email?: string;
+  role?: string;
+  city?: string;
 }
 
 export class UpdateUserRequestDTO extends ApiGatewayRequestDTO<IUpdateUserAttributes> {
@@ -27,6 +27,10 @@ export class UpdateUserRequestDTO extends ApiGatewayRequestDTO<IUpdateUserAttrib
 
   getData(): IUpdatePayload<IUpdateUserAttributes> {
     return super.getData() as IUpdatePayload<IUpdateUserAttributes>;
+  }
+
+  getPathParameters(): { user_id: string } {
+    return super.getPathParameters() as { user_id: string };
   }
 
   getUserId(): string {

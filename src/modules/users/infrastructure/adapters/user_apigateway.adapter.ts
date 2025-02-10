@@ -30,14 +30,19 @@ export class UserApiGatewayAdapter implements CreateUserPort, UpdateUserPort {
     try {
       req.validatePayload();
       const data = req.getData();
+
+      const attributes = data.attributes;
+      console.log('attributes', attributes);
       const createUserDTO = new CreateUserDTO({
-        email: data.attributes.email,
-        password: data.attributes.password,
-        name: data.attributes.name,
-        role: data.attributes.role,
-        city: data.attributes.city,
+        email: attributes.email,
+        password: attributes.password,
+        name: attributes.name,
+        role: attributes.role,
+        city: attributes.city,
       });
+      console.log('createUserDTO', createUserDTO);
       const userDTO = await this.dependencies.service.create(createUserDTO);
+      console.log('userDTO', userDTO);
       return response.setStatus(HttpStatus.CREATED).setPayload(userDTO);
     } catch (error: Exception[] | Exception | unknown) {
       if (
@@ -60,14 +65,15 @@ export class UserApiGatewayAdapter implements CreateUserPort, UpdateUserPort {
     try {
       req.validatePayload();
       req.validateParameters();
-      const data = req.getData();
+      const userId = req.getPathParameters().user_id;
+      const data = req.getData().attributes
       const updateUserDTO = new UpdateUserDTO({
-        id: data.id,
-        email: data.attributes.email,
-        password: data.attributes.password,
-        name: data.attributes.name,
-        role: data.attributes.role,
-        city: data.attributes.city,
+        id: userId,
+        name: data.name,
+        email: data.email,
+        password: data.password,
+        role: data.role,
+        city: data.city,
       });
       const userDTO = await this.dependencies.service.update(updateUserDTO);
       return response.setStatus(HttpStatus.OK).setPayload(userDTO);

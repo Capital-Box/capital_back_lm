@@ -1,4 +1,4 @@
-import bcrypt from 'bcrypt';
+/* import bcrypt from 'bcrypt';
 import { IHasheable } from '../interfaces/iHash.interface';
 
 export class BcryptHashService implements IHasheable {
@@ -14,4 +14,4 @@ export class BcryptHashService implements IHasheable {
   async compare(compareText: string, hashedText: string): Promise<boolean> {
     return await bcrypt.compare(compareText, hashedText);
   }
-}
+} */
