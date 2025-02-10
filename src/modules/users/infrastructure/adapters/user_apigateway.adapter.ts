@@ -32,7 +32,6 @@ export class UserApiGatewayAdapter implements CreateUserPort, UpdateUserPort {
       const data = req.getData();
 
       const attributes = data.attributes;
-      console.log('attributes', attributes);
       const createUserDTO = new CreateUserDTO({
         email: attributes.email,
         password: attributes.password,
@@ -40,9 +39,7 @@ export class UserApiGatewayAdapter implements CreateUserPort, UpdateUserPort {
         role: attributes.role,
         city: attributes.city,
       });
-      console.log('createUserDTO', createUserDTO);
       const userDTO = await this.dependencies.service.create(createUserDTO);
-      console.log('userDTO', userDTO);
       return response.setStatus(HttpStatus.CREATED).setPayload(userDTO);
     } catch (error: Exception[] | Exception | unknown) {
       if (
@@ -66,7 +63,7 @@ export class UserApiGatewayAdapter implements CreateUserPort, UpdateUserPort {
       req.validatePayload();
       req.validateParameters();
       const userId = req.getPathParameters().user_id;
-      const data = req.getData().attributes
+      const data = req.getData().attributes;
       const updateUserDTO = new UpdateUserDTO({
         id: userId,
         name: data.name,

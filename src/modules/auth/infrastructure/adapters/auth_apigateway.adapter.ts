@@ -10,7 +10,7 @@ import { RefreshTokenPort } from "../ports/refresh_token.port";
 import { LogoutPort } from "../ports/logout_user.port";
 import { LogoutCase } from "modules/auth/application/use_cases/logout_user.case";
 import { LogOutResponseDTO } from "../dtos/response/logout_response.dto";
-import { logOutRequestDTO } from "../dtos/request/logout_request.dto";
+import { LogOutRequestDTO } from "../dtos/request/logout_request.dto";
 
 interface AuthApiGatewayAdapterDependencies {
   service: LoginUserCase & RefreshTokenCase & LogoutCase;
@@ -27,7 +27,7 @@ export class AuthApiGatewayAdapter
     req.validatePayload();
     const loginUserDTO = new LoginUserDTO({
       username: req.username,
-      password: req.getPayload().attributes.password,
+      password: req.password,
     });
     const tokenDTO = await this.dependencies.service.login(loginUserDTO);
 
@@ -39,15 +39,15 @@ export class AuthApiGatewayAdapter
   ): Promise<RefreshTokenResponseDTO> {
     req.validatePayload();
     const tokenDTO = await this.dependencies.service.refresh(
-      req.getPayload().attributes.refreshToken
+      req.getData().attributes.refreshToken
     );
     return new RefreshTokenResponseDTO(tokenDTO);
   }
 
-  async logout(req: logOutRequestDTO): Promise<LogOutResponseDTO> {
+  async logout(req: LogOutRequestDTO): Promise<LogOutResponseDTO> {
     req.validatePayload();
     await this.dependencies.service.logout(
-      req.getPayload().attributes.refresh_token
+      req.getData().attributes.refresh_token
     );
     const response = new LogOutResponseDTO();
     return response;

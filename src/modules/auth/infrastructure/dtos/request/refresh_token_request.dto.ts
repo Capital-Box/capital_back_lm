@@ -8,17 +8,17 @@ interface IRefreshTokenAttributes {
 
 export class RefreshTokenRequestDTO extends ApiGatewayRequestDTO<IRefreshTokenAttributes> {
     validatePayload(): void {
-        const payload = this.getPayload().attributes;
+        const payload = this.getData().attributes;
         if (!payload.refreshToken) {
             throw new Error("El refreshToken es obligatorio");
         }
     }
 
-    getPayload(): ICreatePayload<IRefreshTokenAttributes> {
-        return super.getPayload() as ICreatePayload<IRefreshTokenAttributes>;
+    getData(): ICreatePayload<IRefreshTokenAttributes> {
+        return super.getData() as ICreatePayload<IRefreshTokenAttributes>;
     }
 
     get refreshToken(): string {
-        return this.getPayload().attributes.refreshToken;
+        return this.getData().attributes.refreshToken;
     }
 }

@@ -1,6 +1,6 @@
-import { UUID } from '@shared/value_objects/uuid.vo';
-import { Cities } from 'modules/users/domain/enums/cities.enum';
-import { Roles } from 'modules/users/domain/enums/roles.enum';
+import { UUID } from "@shared/value_objects/uuid.vo";
+import { Cities } from "modules/users/domain/enums/cities.enum";
+import { Roles } from "modules/users/domain/enums/roles.enum";
 
 type IUser = {
   id: string;
@@ -9,19 +9,15 @@ type IUser = {
   email: string;
   role: Roles;
   city: Cities;
-  createdDate: Date;
-  lastUpdated: Date;
 };
 
 export class UserDTO {
-  public readonly id: string;
-  public readonly name: string;
-  public readonly password: string;
-  public readonly email: string;
-  public readonly role: Roles;
-  public readonly city: Cities;
-  public readonly createdDate: Date;
-  public readonly lastUpdated: Date;
+  private readonly id: string;
+  private readonly name: string;
+  private readonly password: string;
+  private readonly email: string;
+  private readonly role: Roles;
+  private readonly city: Cities;
 
   constructor(user: IUser) {
     this.id = user.id;
@@ -30,7 +26,40 @@ export class UserDTO {
     this.email = user.email;
     this.role = user.role;
     this.city = user.city;
-    this.createdDate = user.createdDate;
-    this.lastUpdated = user.lastUpdated;
+  }
+
+  getId(): string {
+    return this.id;
+  }
+
+  getName(): string {
+    return this.name;
+  }
+
+  getPassword(): string {
+    return this.password;
+  }
+
+  getEmail(): string {
+    return this.email;
+  }
+
+  getRole(): Roles {
+    return this.role;
+  }
+
+  getCity(): Cities {
+    return this.city;
+  }
+
+  toObject(): IUser {
+    return {
+      id: this.id,
+      name: this.name,
+      password: this.password,
+      email: this.email,
+      role: this.role,
+      city: this.city,
+    };
   }
 }

@@ -8,18 +8,18 @@ interface IlogoutAttributes {
 
 export class LogOutRequestDTO extends ApiGatewayRequestDTO<IlogoutAttributes> {
     validatePayload(): void {
-        const payload = this.getPayload().attributes;
+        const payload = this.getData().attributes;
         if (!payload.refresh_token) {
             throw new Error("El refresh_token es obligatorio");
         }
     }
 
-    getPayload(): ICreatePayload<IlogoutAttributes> {
-        return super.getPayload() as ICreatePayload<IlogoutAttributes>;
+    getData(): ICreatePayload<IlogoutAttributes> {
+        return super.getData() as ICreatePayload<IlogoutAttributes>;
     }
 
     get refresh_token(): string {
-        return this.getPayload().attributes.refresh_token;
+        return this.getData().attributes.refresh_token;
     }
     
 }

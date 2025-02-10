@@ -1,5 +1,5 @@
-import { ApiGatewayResponseDTO } from "@lib/infrastructure/dtos/responses/apigateway_response.dto";
-import { HttpStatus } from "@lib/infrastructure/enums/http_status.enum";
+import { ApiGatewayResponseDTO } from '@lib/infrastructure/dtos/responses/apigateway_response.dto';
+import { HttpStatus } from '@lib/infrastructure/enums/http_status.enum';
 
 interface ILoginAttributes {
   access_token: string;
@@ -8,13 +8,12 @@ interface ILoginAttributes {
 
 export class LoginResponseDTO extends ApiGatewayResponseDTO<ILoginAttributes> {
   constructor(tokens: ILoginAttributes) {
-    super({
-      status: HttpStatus.OK,
-      payload: {
-        id: "",
-        type: "auth",
-        attributes: tokens
-      },
+    super();
+    this.setStatus(HttpStatus.OK);
+    this.setPayload({
+      id: '',
+      type: 'auth',
+      attributes: tokens,
     });
   }
 }

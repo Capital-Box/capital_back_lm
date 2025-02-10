@@ -8,12 +8,14 @@ interface IRefreshTokenAttributes {
 
 export class RefreshTokenResponseDTO extends ApiGatewayResponseDTO<IRefreshTokenAttributes> {
   constructor(tokens: IRefreshTokenAttributes) {
-    super({
-      status: HttpStatus.OK,
-      payload: {
-        id: "",
-        type: "auth",
-        attributes: tokens,
+    super();
+    this.setStatus(HttpStatus.OK);
+    this.setPayload({
+      id: "",
+      type: "auth",
+      attributes: {
+        access_token: tokens.access_token,
+        refresh_token: tokens.refresh_token,
       },
     });
   }
