@@ -14,8 +14,8 @@ provider:
 
 # Custom Vars
 custom:
-  ApiGatewayName: "${self:service}-${sls:stage}"
-  ApiGatewayExportIdName: "${self:custom.ApiGatewayName}-id"
+  ApiGatewayName: '${self:service}-${sls:stage}'
+  ApiGatewayExportIdName: '${self:custom.ApiGatewayName}-id'
 
 # Resources
 resources:
@@ -26,6 +26,19 @@ resources:
       Properties:
         Name: ${self:custom.ApiGatewayName}
         ProtocolType: HTTP
+
+    ApiGatewayAuthorizer:
+      Type: AWS::ApiGatewayV2::Authorizer
+      Properties:
+        ApiId:
+          Ref: ApiGateway
+        AuthorizerType: JWT
+        IdentitySource: ['$request.header.Authorization']
+        Name: 'cognito-authorizer'
+        JwtConfiguration:
+          Audience:
+            - ${param:COGNITO_AUDIENCE}
+          Issuer: ${param:COGNITO_ISSUER_URL}
 
     ApiGatewayStage:
       Type: AWS::ApiGatewayV2::Stage
@@ -38,3 +51,5 @@ resources:
   Outputs:
     ApiId:
       Value: !GetAtt ApiGateway.ApiId
+    CognitoAuthorizerId:
+      Value: !GetAtt ApiGatewayAuthorizer.AuthorizerId

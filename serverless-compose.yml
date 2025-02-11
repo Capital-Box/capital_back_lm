@@ -1,15 +1,25 @@
 services:
+  shared-cognito:
+    path: src/shared-infrastructure/cognito
+    params:
+      AWS_REGION: ${env:AWS_REGION}
+      DEPLOY_CF_ROLE: ${env:DEPLOY_CF_ROLE}
   shared-apigateway:
     path: src/shared-infrastructure/apigateway
     params:
       DEPLOY_CF_ROLE: ${env:DEPLOY_CF_ROLE}
       AWS_REGION: ${env:AWS_REGION}
+      COGNITO_ISSUER_URL: ${shared-cognito.CognitoIssuerUrl}
+      COGNITO_AUDIENCE: ${shared-cognito.CognitoAudience}
   auth:
     path: src/modules/auth
     params:
       DEPLOY_CF_ROLE: ${env:DEPLOY_CF_ROLE}
       AWS_REGION: ${env:AWS_REGION}
       ROOT_APIGATEWAY: ${shared-apigateway.ApiId}
+      COGNITO_USER_POOL_ARN: ${shared-cognito.CognitoUserPoolArn}
+      COGNITO_USER_POOL_ID: ${shared-cognito.CognitoUserPoolId}
+      COGNITO_USER_POOL_CLIENT_ID: ${shared-cognito.CognitoUserPoolClientId}
   users:
     path: src/modules/users
     params:
@@ -24,3 +34,6 @@ services:
       DEPLOY_CF_ROLE: ${env:DEPLOY_CF_ROLE}
       AWS_REGION: ${env:AWS_REGION}
       ROOT_APIGATEWAY: ${shared-apigateway.ApiId}
+      COGNITO_ISSUER_URL: ${shared-cognito.CognitoIssuerUrl}
+      COGNITO_AUDIENCE: ${shared-cognito.CognitoAudience}
+      COGNITO_AUTHORIZER_ID: ${shared-apigateway.CognitoAuthorizerId}

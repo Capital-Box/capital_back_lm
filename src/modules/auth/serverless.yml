@@ -27,11 +27,11 @@ provider:
             - cognito-idp:AdminSetUserPassword
             - cognito-idp:AdminUpdateUserAttributes
           Resource:
-            - !GetAtt UserPool.Arn
+            - ${param:COGNITO_USER_POOL_ARN}
 
   environment:
-    COGNITO_USER_POOL_ID: !Ref UserPool
-    COGNITO_CLIENT_ID: !Ref UserPoolClient
+    COGNITO_USER_POOL_ID: ${param:COGNITO_USER_POOL_ID}
+    COGNITO_CLIENT_ID: ${param:COGNITO_USER_POOL_CLIENT_ID}
 
 functions:
   login:
@@ -57,17 +57,6 @@ functions:
     handler: exports/createAuth.handle
 
 resources:
-  Resources:
-    UserPool:
-      Type: AWS::Cognito::UserPool
-      Properties:
-        UserPoolName: ${self:service}-user-pool
-    UserPoolClient:
-      Type: AWS::Cognito::UserPoolClient
-      Properties:
-        UserPoolId:
-          Ref: UserPool
-        ClientName: ${self:service}-user-pool-client
   Outputs:
     SaveAuthUserFunction:
       Value: !Ref SaveAuthLambdaFunction

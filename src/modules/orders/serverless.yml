@@ -101,6 +101,9 @@ functions:
       - httpApi:
           method: POST
           path: /orders
+          authorizer:
+            id: ${param:COGNITO_AUTHORIZER_ID}
+
   change-status-order:
     handler: ./exports/change_status_order_function.handler
     events:

@@ -1,0 +1,35 @@
+service: capital-box-cognito
+frameworkVersion: 4.4.x
+
+provider:
+  name: aws
+  region: ${param:AWS_REGION}
+
+  logRetentionInDays: 7
+
+  iam:
+    deploymentRole: ${param:DEPLOY_CF_ROLE}
+
+resources:
+  Resources:
+    UserPool:
+      Type: AWS::Cognito::UserPool
+      Properties:
+        UserPoolName: ${self:service}-user-pool
+    UserPoolClient:
+      Type: AWS::Cognito::UserPoolClient
+      Properties:
+        UserPoolId:
+          Ref: UserPool
+        ClientName: ${self:service}-user-pool-client
+  Outputs:
+    CognitoUserPoolArn:
+      Value: !GetAtt UserPool.Arn
+    CognitoUserPoolId:
+      Value: !Ref UserPool
+    CognitoUserPoolClientId:
+      Value: !Ref UserPoolClient
+    CognitoIssuerUrl:
+      Value: !GetAtt UserPool.ProviderURL
+    CognitoAudience:
+      Value: !GetAtt UserPoolClient.ClientId
