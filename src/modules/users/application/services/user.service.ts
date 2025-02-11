@@ -29,7 +29,7 @@ export class UserService
       createUserDTO,
       this.hashService,
     );
-    this.authUserPort.save(
+    await this.authUserPort.save(
       new CreateAuthUserDTO(
         userEntity.getId(),
         userEntity.getEmail(),

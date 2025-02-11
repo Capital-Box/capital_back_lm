@@ -16,8 +16,8 @@ services:
       DEPLOY_CF_ROLE: ${env:DEPLOY_CF_ROLE}
       AWS_REGION: ${env:AWS_REGION}
       ROOT_APIGATEWAY: ${shared-apigateway.ApiId}
-      SAVE_AUTH_USER_FUNCTION: ${auth.SAVE_AUTH_USER_FUNCTION}
-      SAVE_AUTH_USER_FUNCTION_ARN: ${auth.SAVE_AUTH_USER_FUNCTION_ARN}
+      SAVE_AUTH_USER_FUNCTION: ${auth.SaveAuthUserFunction}
+      SAVE_AUTH_USER_FUNCTION_ARN: ${auth.SaveAuthUserFunctionArn}
   orders:
     path: src/modules/orders
     params:

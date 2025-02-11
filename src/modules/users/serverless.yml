@@ -38,56 +38,46 @@ provider:
             - !GetAtt UsersTable.Arn
             - !Sub 'arn:aws:dynamodb:${AWS::Region}:${AWS::AccountId}:table/${UsersTable}/index/*'
 
-# Variables de entorno para la tabla
-environment:
-  USERS_TABLE_NAME: !Ref UsersTable
-  SAVE_AUTH_USER_FUNCTION: ${param:SAVE_AUTH_USER_FUNCTION}
+  # Variables de entorno para la tabla
+  environment:
+    USERS_TABLE_NAME: !Ref UsersTable
+    SAVE_AUTH_USER_FUNCTION: ${param:SAVE_AUTH_USER_FUNCTION}
 
 functions:
   create:
     handler: exports/createUserFunction.handle
-    environment:
-      USERS_TABLE_NAME: !Ref UsersTable
     events:
-      - http:
-          path: users/register
-          method: post
+      - httpApi:
+          path: /users/register
+          method: POST
 
   update:
     handler: exports/updateUserFunction.handle
-    environment:
-      USERS_TABLE_NAME: !Ref UsersTable
     events:
-      - http:
-          path: users/update/{user_id}
-          method: put
+      - httpApi:
+          path: /users/{user_id}
+          method: PUT
 
   delete:
     handler: exports/deleteUserFunction.handle
-    environment:
-      USERS_TABLE_NAME: !Ref UsersTable
     events:
-      - http:
-          path: users/delete/{userId}
-          method: delete
+      - httpApi:
+          path: /users/{userId}
+          method: DELETE
 
   listUsers:
     handler: exports/listUsersFunction.handle
-    environment:
-      USERS_TABLE_NAME: !Ref UsersTable
     events:
-      - http:
-          path: users/listUsers
-          method: get
+      - httpApi:
+          path: /users
+          method: GET
 
   getUserById:
     handler: handler.getUserById
-    environment:
-      USERS_TABLE_NAME: !Ref UsersTable
     events:
-      - http:
-          path: users/{user_id}
-          method: get
+      - httpApi:
+          path: /users/{user_id}
+          method: GET
 
 resources:
   Resources:

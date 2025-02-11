@@ -12,7 +12,11 @@ export const handle = async (req: APIGatewayProxyEventV2) => {
     tableName: process.env.USERS_TABLE_NAME!,
   });
 
-  const authUserPort = new AuthUserInvokeAdapter();
+  const authUserPort = new AuthUserInvokeAdapter(
+    process.env.SAVE_AUTH_USER_FUNCTION,
+  );
+
+  console.log('FunctionName', process.env.SAVE_AUTH_USER_FUNCTION);
 
   // 2. Crear el servicio
   const userService = new UserService(

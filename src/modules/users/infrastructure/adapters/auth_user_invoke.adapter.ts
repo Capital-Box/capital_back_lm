@@ -7,16 +7,22 @@ import {
 } from '@aws-sdk/client-lambda';
 
 export class AuthUserInvokeAdapter implements AuthUserPort {
-  constructor(private client = new LambdaClient()) {}
+  constructor(
+    private functionName: string,
+    private client = new LambdaClient(),
+  ) {}
 
   async save(createAuthUser: CreateAuthUserDTO): Promise<void> {
     const invokeLambdaInputParams: InvokeCommandInput = {
-      FunctionName: process.env.SAVE_AUTH_USER_FUNCTION,
+      FunctionName: this.functionName,
+      InvocationType: 'Event',
       Payload: JSON.stringify({
-        data: {
-          type: 'register',
-          attributes: {
-            ...createAuthUser,
+        payload: {
+          data: {
+            type: 'register',
+            attributes: {
+              ...createAuthUser,
+            },
           },
         },
       }),
@@ -25,7 +31,7 @@ export class AuthUserInvokeAdapter implements AuthUserPort {
     const invokeCommand: InvokeCommand = new InvokeCommand(
       invokeLambdaInputParams,
     );
-    this.client.send(invokeCommand);
+    await this.client.send(invokeCommand);
     console.log('saveAuth', createAuthUser);
   }
 }

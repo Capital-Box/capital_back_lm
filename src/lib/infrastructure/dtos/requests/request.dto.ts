@@ -54,7 +54,7 @@ export type IRequestContext = {
   };
 };
 
-type IRequest<TAttributes> = {
+export type IRequest<TAttributes> = {
   payload: IRequestPayload<TAttributes>;
   context: IRequestContext;
 };
