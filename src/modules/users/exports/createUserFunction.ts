@@ -16,8 +16,6 @@ export const handle = async (req: APIGatewayProxyEventV2) => {
     process.env.SAVE_AUTH_USER_FUNCTION,
   );
 
-  console.log('FunctionName', process.env.SAVE_AUTH_USER_FUNCTION);
-
   // 2. Crear el servicio
   const userService = new UserService(
     userRepository,

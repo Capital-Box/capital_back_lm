@@ -13,6 +13,7 @@ export class AuthUserInvokeAdapter implements AuthUserPort {
   ) {}
 
   async save(createAuthUser: CreateAuthUserDTO): Promise<void> {
+    console.log('createAuthUser', createAuthUser);
     const invokeLambdaInputParams: InvokeCommandInput = {
       FunctionName: this.functionName,
       InvocationType: 'Event',

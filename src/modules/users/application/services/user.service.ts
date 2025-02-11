@@ -29,6 +29,7 @@ export class UserService
       createUserDTO,
       this.hashService,
     );
+    console.log('userEntity', userEntity);
     await this.authUserPort.save(
       new CreateAuthUserDTO(
         userEntity.getId(),
@@ -69,7 +70,6 @@ export class UserService
   }
 
   private async checkExists(email: string): Promise<boolean> {
-    console.log('entre al checkExists', email);
     const user = await this.userRepository.findByEmail(email, this.hashService);
     return user ? true : false;
   }
