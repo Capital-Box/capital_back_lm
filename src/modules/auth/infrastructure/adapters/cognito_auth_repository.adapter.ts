@@ -113,9 +113,12 @@ export class CognitoAuthRepository implements AuthRepositoryPort {
             Name: 'email_verified',
             Value: 'true',
           },
+          {
+            Name: 'custom:role',
+            Value: data.role,
+          },
         ],
       };
-      console.log(newUser);
       try {
         await this.cognitoClient.send(
           new AdminCreateUserCommand({

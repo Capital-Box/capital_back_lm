@@ -34,6 +34,7 @@ export class UserService
         userEntity.getId(),
         userEntity.getEmail(),
         createUserDTO.password,
+        userEntity.getRole(),
       ),
     );
     const savedUser = await this.userRepository.save(userEntity);

@@ -27,11 +27,9 @@ export class AuthUserInvokeAdapter implements AuthUserPort {
         },
       }),
     };
-    console.log('invokeLambdaInputParams', invokeLambdaInputParams);
     const invokeCommand: InvokeCommand = new InvokeCommand(
       invokeLambdaInputParams,
     );
     await this.client.send(invokeCommand);
-    console.log('saveAuth', createAuthUser);
   }
 }
