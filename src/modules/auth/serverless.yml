@@ -13,6 +13,10 @@ provider:
   # Logs Configs
   logRetentionInDays: 7
 
+  # Root API
+  httpApi:
+    id: ${param:ROOT_APIGATEWAY}
+
   iam:
     role:
       statements:
@@ -60,7 +64,7 @@ functions:
       - http:
           path: auth/logout
           method: post
-  save: 
+  save:
     handler: exports/createUserFunction.handle
 resources:
   Resources:

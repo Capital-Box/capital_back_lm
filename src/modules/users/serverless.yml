@@ -13,6 +13,10 @@ provider:
   # Logs Configs
   logRetentionInDays: 7
 
+  # Root API
+  httpApi:
+    id: ${param:ROOT_APIGATEWAY}
+
   # IAM role con permisos para DynamoDB
   iam:
     role:
