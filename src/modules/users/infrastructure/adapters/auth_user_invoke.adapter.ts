@@ -11,7 +11,7 @@ export class AuthUserInvokeAdapter implements AuthUserPort {
 
   async save(createAuthUser: CreateAuthUserDTO): Promise<void> {
     const invokeLambdaInputParams: InvokeCommandInput = {
-      FunctionName: process.env.saveAuthUser,
+      FunctionName: process.env.SAVE_AUTH_USER_FUNCTION,
       Payload: JSON.stringify({
         data: {
           type: 'register',

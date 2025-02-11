@@ -25,7 +25,7 @@ provider:
           Action:
             - lambda:InvokeFunction
           Resource:
-            - ${param:saveAuthUserArn}
+            - ${param:SAVE_AUTH_USER_FUNCTION_ARN}
         - Effect: Allow
           Action:
             - dynamodb:PutItem
@@ -41,7 +41,7 @@ provider:
 # Variables de entorno para la tabla
 environment:
   USERS_TABLE_NAME: !Ref UsersTable
-  saveAuthUser: ${param:saveAuthUser}
+  SAVE_AUTH_USER_FUNCTION: ${param:SAVE_AUTH_USER_FUNCTION}
 
 functions:
   create:
