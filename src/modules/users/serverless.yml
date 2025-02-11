@@ -19,16 +19,20 @@ provider:
       statements:
         - Effect: Allow
           Action:
+            - lambda:InvokeFunction
+          Resource:
+            - ${param:saveAuthUserArn}
+        - Effect: Allow
+          Action:
             - dynamodb:PutItem
             - dynamodb:GetItem
             - dynamodb:UpdateItem
             - dynamodb:DeleteItem
             - dynamodb:Query
             - dynamodb:Scan
-          Resource: 
+          Resource:
             - !GetAtt UsersTable.Arn
-            - !Sub "arn:aws:dynamodb:${AWS::Region}:${AWS::AccountId}:table/${UsersTable}/index/*"
-
+            - !Sub 'arn:aws:dynamodb:${AWS::Region}:${AWS::AccountId}:table/${UsersTable}/index/*'
 
 # Variables de entorno para la tabla
 environment:
@@ -81,7 +85,6 @@ functions:
           path: users/{user_id}
           method: get
 
-
 resources:
   Resources:
     UsersTable:
@@ -104,19 +107,19 @@ resources:
           - AttributeName: PK
             KeyType: HASH
         GlobalSecondaryIndexes:
-          - IndexName: "email"
+          - IndexName: 'email'
             KeySchema:
               - AttributeName: email
                 KeyType: HASH
             Projection:
               ProjectionType: ALL
-          - IndexName: "role"
+          - IndexName: 'role'
             KeySchema:
               - AttributeName: role
                 KeyType: HASH
             Projection:
               ProjectionType: ALL
-          - IndexName: "roleCreatedDate"
+          - IndexName: 'roleCreatedDate'
             KeySchema:
               - AttributeName: role
                 KeyType: HASH
@@ -124,7 +127,7 @@ resources:
                 KeyType: RANGE
             Projection:
               ProjectionType: ALL
-          - IndexName: "allUsers"
+          - IndexName: 'allUsers'
             KeySchema:
               - AttributeName: all
                 KeyType: HASH

@@ -8,7 +8,11 @@ import { UserMapper } from '../mappers/user.mapper';
 import { CreateUserCase } from '../use_cases/create_user.case';
 import { DeleteUserCase } from '../use_cases/delete_user.case';
 import { UpdateUserCase } from '../use_cases/update_user.case';
-import { InvokeCommand, InvokeCommandInput, LambdaClient } from '@aws-sdk/client-lambda';
+import {
+  InvokeCommand,
+  InvokeCommandInput,
+  LambdaClient,
+} from '@aws-sdk/client-lambda';
 
 export class UserService
   implements CreateUserCase, UpdateUserCase, DeleteUserCase
@@ -17,7 +21,6 @@ export class UserService
     private readonly userRepository: UserRepositoryPort,
     private readonly hashService: IHasheable,
     private client = new LambdaClient(),
-
   ) {}
 
   async create(createUserDTO: CreateUserDTO): Promise<UserDTO> {
@@ -32,14 +35,14 @@ export class UserService
     const invokeLambdaInputParams: InvokeCommandInput = {
       FunctionName: process.env.saveAuthUser,
       Payload: JSON.stringify({
-        "data": {
-          "type": "register",
-          "attributes": {
-            "username": userEntity.getId(),
-            "email": userEntity.getEmail(),
-            "password": createUserDTO.password,
-          }
-        }
+        data: {
+          type: 'register',
+          attributes: {
+            username: userEntity.getId(),
+            email: userEntity.getEmail(),
+            password: createUserDTO.password,
+          },
+        },
       }),
     };
     console.log('invokeLambdaInputParams', invokeLambdaInputParams);
@@ -48,14 +51,17 @@ export class UserService
     );
     this.client.send(invokeCommand);
     console.log('saveAuth', userEntity);
-    
+
     const savedUser = await this.userRepository.save(userEntity);
     const userDTO = UserMapper.toDTO(savedUser);
     return userDTO;
   }
 
   async update(updateUserDTO: UpdateUserDTO): Promise<UserDTO> {
-    const userEntity = await this.userRepository.findById(updateUserDTO.id, this.hashService);
+    const userEntity = await this.userRepository.findById(
+      updateUserDTO.id,
+      this.hashService,
+    );
     if (!userEntity) {
       throw new Error('User not found');
     }
@@ -98,6 +104,4 @@ export class UserService
     }
     return UserMapper.toDTO(user);
   }
-
-  
 }
