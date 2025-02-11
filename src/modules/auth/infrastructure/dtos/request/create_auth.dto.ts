@@ -7,6 +7,7 @@ export interface ICreateAuthAttributes {
   username: string;
   email: string;
   password: string;
+  role: string;
 }
 
 export class CreateAuthDTO extends RequestDTO<ICreateAuthAttributes> {
