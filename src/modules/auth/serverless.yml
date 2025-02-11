@@ -58,37 +58,6 @@ functions:
     handler: exports/createAuth.handle
 
 resources:
-  Resources:
-    UserPool:
-      Type: AWS::Cognito::UserPool
-      Properties:
-        UserPoolName: ${self:service}-user-pool
-        Policies:
-          PasswordPolicy:
-            MinimumLength: 6
-            RequireLowercase: true
-            RequireNumbers: false
-            RequireSymbols: false
-            RequireUppercase: false
-        Schema:
-          - Name: email
-            Required: true
-            Mutable: true
-          - Name: custom:role
-            AttributeDataType: String
-            DeveloperOnlyAttribute: false
-            Mutable: true
-            Required: false
-            StringAttributeConstraints:
-              MinLength: '0'
-              MaxLength: '50'
-    UserPoolClient:
-      Type: AWS::Cognito::UserPoolClient
-      Properties:
-        UserPoolId:
-          Ref: UserPool
-        ClientName: ${self:service}-user-pool-client
-
   Outputs:
     SaveAuthUserFunction:
       Value: !Ref SaveAuthLambdaFunction

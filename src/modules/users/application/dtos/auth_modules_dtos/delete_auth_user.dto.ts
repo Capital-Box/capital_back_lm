@@ -1,0 +1,6 @@
+export class DeleteAuthUserDTO {
+  constructor(
+    public readonly username: string,
+    public readonly email: string,
+  ) {}
+}

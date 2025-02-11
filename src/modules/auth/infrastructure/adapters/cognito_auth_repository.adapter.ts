@@ -4,13 +4,15 @@ import {
   AdminSetUserPasswordCommand,
   CognitoIdentityProviderClient,
   RevokeTokenCommand,
+  AdminUpdateUserAttributesCommand,
+  AdminDeleteUserCommand,
 } from '@aws-sdk/client-cognito-identity-provider';
 
-import { AuthRepositoryPort } from '../ports/auth_repository.port';
 import { TokenDTO } from 'modules/auth/application/dtos/token.dto';
-import { User } from 'modules/users/domain/entities/user.entity';
-import { CreateUserDTO } from 'modules/users/application/dtos/create_user.dto';
 import { CreateAuthDTO } from '../dtos/request/create_auth.dto';
+import { AuthRepositoryPort } from '../ports/auth_repository.port';
+import { UpdateAuthDTO } from '../dtos/request/update_auth.dto';
+import { DeleteAuthDTO } from '../dtos/request/delete_auth.dto';
 
 interface CognitoAuthRepositoryDependencies {
   userPoolId: string;
@@ -97,9 +99,6 @@ export class CognitoAuthRepository implements AuthRepositoryPort {
 
   async save(user: CreateAuthDTO): Promise<void> {
     try {
-      console.log('userpoolid', this.userPoolId);
-      console.log('clientId', this.clientId);
-      console.log(user);
       const data = user.getData().attributes;
       const newUser = {
         Username: data.username,
@@ -114,7 +113,7 @@ export class CognitoAuthRepository implements AuthRepositoryPort {
             Value: 'true',
           },
           {
-            Name: 'custom:role',
+            Name: 'custom:custom:role',
             Value: data.role,
           },
         ],
@@ -156,6 +155,53 @@ export class CognitoAuthRepository implements AuthRepositoryPort {
       );
     } catch (error: any) {
       throw new Error('Error on change password');
+    }
+  }
+
+  async update(user: UpdateAuthDTO): Promise<void> {
+    try {
+      const data = user.getData().attributes;
+      const newUser = {
+        Username: data.username,
+        UserAttributes: [
+          {
+            Name: 'email',
+            Value: data.email,
+          },
+          {
+            Name: 'custom:custom:role',
+            Value: data.role,
+          },
+        ],
+      };
+      await this.cognitoClient.send(
+        new AdminUpdateUserAttributesCommand({
+          UserPoolId: this.userPoolId!,
+          Username: newUser.Username,
+          UserAttributes: newUser.UserAttributes,
+        }),
+      );
+      if (data.password) {
+        await this.changePassword(data.username, data.password);
+      }
+    } catch (error: any) {
+      console.error('Error updating user in Cognito:', error);
+      throw new Error('Error on update user');
+    }
+  }
+
+  async delete(user: DeleteAuthDTO): Promise<void> {
+    try {
+      const data = user.getData().attributes;
+      await this.cognitoClient.send(
+        new AdminDeleteUserCommand({
+          UserPoolId: this.userPoolId!,
+          Username: data.username,
+        }),
+      );
+    } catch (error: any) {
+      console.error('Error deleting user in Cognito:', error);
+      throw new Error('Error on delete user');
     }
   }
 }

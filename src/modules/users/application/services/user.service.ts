@@ -9,7 +9,9 @@ import { CreateUserCase } from '../use_cases/create_user.case';
 import { DeleteUserCase } from '../use_cases/delete_user.case';
 import { UpdateUserCase } from '../use_cases/update_user.case';
 import { AuthUserPort } from 'modules/users/infrastructure/ports/auth_user.port';
-import { CreateAuthUserDTO } from '../dtos/create_auth_user.dto';
+import { CreateAuthUserDTO } from '../dtos/auth_modules_dtos/create_auth_user.dto';
+import { UpdateAuthUserDTO } from '../dtos/auth_modules_dtos/update_auth_user.dto';
+import { DeleteAuthUserDTO } from '../dtos/auth_modules_dtos/delete_auth_user.dto';
 
 export class UserService
   implements CreateUserCase, UpdateUserCase, DeleteUserCase
@@ -29,7 +31,6 @@ export class UserService
       createUserDTO,
       this.hashService,
     );
-    console.log('userEntity', userEntity);
     await this.authUserPort.save(
       new CreateAuthUserDTO(
         userEntity.getId(),
@@ -56,11 +57,26 @@ export class UserService
       updateUserDTO,
       this.hashService,
     );
+    await this.authUserPort.update(
+      new UpdateAuthUserDTO(
+        userFactory.getId(),
+        userFactory.getEmail(),
+        updateUserDTO.password,
+        userFactory.getRole(),
+      ),
+    );
     const updatedUser = await this.userRepository.update(userFactory);
     return UserMapper.toDTO(updatedUser);
   }
 
   async delete(userId: string): Promise<void> {
+    const user = await this.userRepository.findById(userId, this.hashService);
+    if (!user) {
+      throw new Error('User not found');
+    }
+    await this.authUserPort.delete(
+      new DeleteAuthUserDTO(user.getId(), user.getEmail()),
+    );
     await this.userRepository.delete(userId);
   }
 
