@@ -37,12 +37,19 @@ provider:
             - dynamodb:BatchWriteItem
           Resource:
             - !GetAtt PackageTable.Arn
+        ## Allow OrderHistory DynamoDB
+        - Effect: Allow
+          Action:
+            - dynamodb:PutItem
+          Resource:
+            - !GetAtt OrderHistoryTable.Arn
 
   # Environment Vars for Lambdas
   environment:
     ORDER_TABLE_NAME: ${self:custom.orderTableName}
     RECEIVER_TABLE_NAME: ${self:custom.receiverTableName}
     PACKAGE_TABLE_NAME: ${self:custom.packageTableName}
+    ORDER_HISTORY_TABLE_NAME: ${self:custom.orderHistoryTableName}
 
   # Root API
   httpApi:
@@ -53,6 +60,7 @@ custom:
   orderTableName: ${sls:stage}-orders
   receiverTableName: ${sls:stage}-receivers
   packageTableName: ${sls:stage}-packages
+  orderHistoryTableName: ${sls:stage}-order-history
 
 # Resources
 resources:
@@ -92,6 +100,22 @@ resources:
         KeySchema:
           - AttributeName: id
             KeyType: HASH
+
+    OrderHistoryTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: ${self:custom.orderHistoryTableName}
+        BillingMode: PAY_PER_REQUEST
+        AttributeDefinitions:
+          - AttributeName: order_id
+            AttributeType: S
+          - AttributeName: id
+            AttributeType: S
+        KeySchema:
+          - AttributeName: order_id
+            KeyType: HASH
+          - AttributeName: id
+            KeyType: RANGE
 
 # Functions
 functions:

@@ -8,6 +8,7 @@ import { ExternalProvider } from '../value_objects/external_provider.vo';
 import { ExternalProviders } from '../enums/external_providers.enum';
 import { Location } from '../value_objects/location';
 import { Package } from './package.entity';
+import { Event } from '@lib/domain/event';
 
 interface OrderConstructor {
   id: UUID;
@@ -45,6 +46,10 @@ export class Order extends Entity {
     this.lastUpdated = order.lastUpdated;
   }
 
+  addEvent(event: Event): void {
+    super.addEvent(event);
+  }
+
   getId(): string {
     return this.id.getUUID();
   }
@@ -69,6 +74,10 @@ export class Order extends Entity {
     return this.destiny;
   }
 
+  getOrderStatus(): OrderStatus {
+    return this.status;
+  }
+
   getMainStatus(): OrderMainStatuses {
     return this.status.getMainStatus();
   }
@@ -82,31 +91,17 @@ export class Order extends Entity {
     subStatus: OrderSubStatuses,
   ): void {
     this.status.changeStatus(mainStatus, subStatus);
-    this.addEvent(
-      new OrderChangeStatusEvent(this.id.getUUID(), mainStatus, subStatus),
-    );
+    this.addEvent(new OrderChangeStatusEvent(this.id, this.status));
   }
 
   nextStatus(): void {
     this.status.nextStatus();
-    this.addEvent(
-      new OrderChangeStatusEvent(
-        this.id.getUUID(),
-        this.status.getMainStatus(),
-        this.status.getSubStatus(),
-      ),
-    );
+    this.addEvent(new OrderChangeStatusEvent(this.id, this.status));
   }
 
   prevStatus(): void {
     this.status.prevStatus();
-    this.addEvent(
-      new OrderChangeStatusEvent(
-        this.id.getUUID(),
-        this.status.getMainStatus(),
-        this.status.getSubStatus(),
-      ),
-    );
+    this.addEvent(new OrderChangeStatusEvent(this.id, this.status));
   }
 
   getPackages(): Package[] {

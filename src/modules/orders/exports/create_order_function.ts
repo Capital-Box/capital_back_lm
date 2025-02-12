@@ -6,6 +6,10 @@ import { ReceiverDynamoAdapter } from '../infrastructure/adapters/receiver_dynam
 import { CreateOrderRequestDTO } from '../infrastructure/dto/requests/create_order_request.dto';
 import { ClassValidatorService } from '@lib/application/service/class_validator.service';
 import { PackageDynamoAdapter } from '../infrastructure/adapters/package_dynamo.adapter';
+import { OrderHistoryService } from '../application/services/order_history.service';
+import { OrderHistoryDynamoAdapter } from '../infrastructure/adapters/order_history_dynamo.adapter';
+import { OrderStatusEventSubscriber } from '../application/subscribers/order_status_event.subscriber';
+import { Publisher } from '@lib/application/publisher';
 
 const orderDynamoAdapter = new OrderDynamoAdapter(process.env.ORDER_TABLE_NAME);
 const receiverDynamoAdapter = new ReceiverDynamoAdapter(
@@ -15,10 +19,23 @@ const packageDynamoAdapter = new PackageDynamoAdapter(
   process.env.PACKAGE_TABLE_NAME,
 );
 
+const orderHistoryRepository = new OrderHistoryDynamoAdapter(
+  process.env.ORDER_HISTORY_TABLE_NAME,
+);
+
+const orderHistoryService = new OrderHistoryService(orderHistoryRepository);
+
+const orderHistorySubscriber = new OrderStatusEventSubscriber(
+  orderHistoryService,
+);
+
+const orderPublisher = new Publisher().subscribe(orderHistorySubscriber);
+
 const orderService = new OrderService({
   orderRepository: orderDynamoAdapter,
   receiverRepository: receiverDynamoAdapter,
   packageRepository: packageDynamoAdapter,
+  publisher: orderPublisher,
 });
 
 const classValidatorService = new ClassValidatorService();
