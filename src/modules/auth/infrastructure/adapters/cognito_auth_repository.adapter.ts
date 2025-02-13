@@ -6,6 +6,7 @@ import {
   RevokeTokenCommand,
   AdminUpdateUserAttributesCommand,
   AdminDeleteUserCommand,
+  ListUsersCommand,
 } from '@aws-sdk/client-cognito-identity-provider';
 
 import { TokenDTO } from 'modules/auth/application/dtos/token.dto';
@@ -31,30 +32,61 @@ export class CognitoAuthRepository implements AuthRepositoryPort {
     this.clientId = dependencies.clientId;
   }
 
-  async authenticate(username: string, password: string): Promise<TokenDTO> {
+  async authenticate(email: string, password: string): Promise<TokenDTO> {
+    // 1. Look up the user by email
+    let username: string | undefined;
     try {
-      const command = new AdminInitiateAuthCommand({
+      const listUsersCommand = new ListUsersCommand({
         UserPoolId: this.userPoolId,
-        ClientId: this.clientId,
-        AuthFlow: 'ADMIN_USER_PASSWORD_AUTH',
-        AuthParameters: {
-          USERNAME: username,
-          PASSWORD: password,
-        },
+        Filter: `email = "${email}"`,
+        Limit: 1,
       });
 
-      const response = await this.cognitoClient.send(command);
-      const accessToken = response.AuthenticationResult?.IdToken ?? '';
-      const refreshToken = response.AuthenticationResult?.RefreshToken ?? '';
+      const listUsersResponse = await this.cognitoClient.send(listUsersCommand);
 
-      const token = new TokenDTO({
-        access_token: accessToken,
-        refresh_token: refreshToken,
-      });
+      if (!listUsersResponse.Users || listUsersResponse.Users.length === 0) {
+        throw new Error('User not found');
+      }
 
-      return new TokenDTO(token);
+      const user = listUsersResponse.Users[0];
+      username = user.Username;
+
+      if (!username) {
+        throw new Error('Invalid credentials'); // Or handle the missing username case
+      }
+      try {
+        const command = new AdminInitiateAuthCommand({
+          UserPoolId: this.userPoolId,
+          ClientId: this.clientId,
+          AuthFlow: 'ADMIN_USER_PASSWORD_AUTH',
+          AuthParameters: {
+            USERNAME: username,
+            PASSWORD: password,
+          },
+        });
+
+        const response = await this.cognitoClient.send(command);
+        const accessToken = response.AuthenticationResult?.IdToken ?? '';
+        const refreshToken = response.AuthenticationResult?.RefreshToken ?? '';
+
+        const token = new TokenDTO({
+          access_token: accessToken,
+          refresh_token: refreshToken,
+        });
+
+        return new TokenDTO(token);
+      } catch (error: any) {
+        console.error('Error during AdminInitiateAuthCommand:', error);
+        // Re-throw the error to be handled upstream
+        throw error;
+      }
     } catch (error: any) {
-      throw new Error('Invalid credentials');
+      console.error('Error in authenticate method:', error);
+      if (error.message === 'User not found') {
+        throw error; // Re-throw the "User not found" error
+      }
+      // If it's another error during user listing, throw a generic authentication error
+      throw new Error('Authentication failed');
     }
   }
 
@@ -81,6 +113,7 @@ export class CognitoAuthRepository implements AuthRepositoryPort {
 
       return new TokenDTO(token);
     } catch (error: any) {
+      console.error('Error during refresh:', error);
       throw new Error('Refresh token invalid');
     }
   }
@@ -93,6 +126,7 @@ export class CognitoAuthRepository implements AuthRepositoryPort {
       });
       await this.cognitoClient.send(command);
     } catch (error: any) {
+      console.error('Error during logout:', error);
       throw new Error('Error on logout');
     }
   }
@@ -113,7 +147,7 @@ export class CognitoAuthRepository implements AuthRepositoryPort {
             Value: 'true',
           },
           {
-            Name: 'custom:custom:role',
+            Name: 'custom:role',
             Value: data.role,
           },
         ],
@@ -154,6 +188,7 @@ export class CognitoAuthRepository implements AuthRepositoryPort {
         }),
       );
     } catch (error: any) {
+      console.error('Error during changePassword:', error);
       throw new Error('Error on change password');
     }
   }

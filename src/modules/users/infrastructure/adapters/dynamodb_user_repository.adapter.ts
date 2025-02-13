@@ -134,7 +134,10 @@ export class DynamoDbUserRepository implements UserRepositoryPort {
     }
   }
 
-  async findByEmail(email: string, hashService: IHasheable): Promise<User | null> {
+  async findByEmail(
+    email: string,
+    hashService: IHasheable,
+  ): Promise<User | null> {
     const params = {
       TableName: this.tableName,
       IndexName: 'email',
@@ -156,7 +159,6 @@ export class DynamoDbUserRepository implements UserRepositoryPort {
     }
     data.id = data.PK;
     return UserFactory.load(data as UserDTO, hashService);
-
   }
 
   async list(): Promise<User[]> {
